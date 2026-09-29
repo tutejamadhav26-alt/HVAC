@@ -1,0 +1,17 @@
+{
+  "feature_names": [
+    "temperature",
+    "humidity",
+    "pressure",
+    "current",
+    "power"
+  ],
+  "fault_classes": [
+    "compressor_overload",
+    "filter_clogging",
+    "normal",
+    "refrigerant_leakage"
+  ],
+  "trained_at": "2026-09-21T15:45:43.501819",
+  "num_samples": 5000
+}

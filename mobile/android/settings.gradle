@@ -1,0 +1,2 @@
+rootProject.name = 'SmartHVAC'
+include ':app'
