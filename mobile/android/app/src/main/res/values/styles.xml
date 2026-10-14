@@ -1,0 +1,8 @@
+<resources>
+    <style name="Theme.AppCompat.DayNight.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">#0f172a</item>
+        <item name="colorPrimary">#0284c7</item>
+        <item name="colorPrimaryDark">#0369a1</item>
+        <item name="colorAccent">#38bdf8</item>
+    </style>
+</resources>

@@ -101,7 +101,7 @@ class MQTTManager:
                 pressure=press,
                 current=curr,
                 power=pow_w,
-                timestamp=datetime.datetime.utcnow()
+                timestamp=datetime.datetime.now(datetime.timezone.utc)
             )
             db.add(reading)
             db.commit()
@@ -119,7 +119,7 @@ class MQTTManager:
                 severity=pred_dict["severity"],
                 health_score=pred_dict["health_score"],
                 recommended_action=pred_dict["recommended_action"],
-                timestamp=datetime.datetime.utcnow()
+                timestamp=datetime.datetime.now(datetime.timezone.utc)
             )
             db.add(prediction)
 

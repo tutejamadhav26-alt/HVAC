@@ -3,6 +3,9 @@ from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, Foreig
 from sqlalchemy.orm import relationship
 from database import Base
 
+def utc_now():
+    return datetime.datetime.now(datetime.timezone.utc)
+
 class User(Base):
     __tablename__ = "users"
 
@@ -12,7 +15,7 @@ class User(Base):
     full_name = Column(String, nullable=True)
     role = Column(String, default="staff")  # 'admin' or 'staff'
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    created_at = Column(DateTime, default=utc_now)
 
 class HVACUnit(Base):
     __tablename__ = "hvac_units"
@@ -22,7 +25,7 @@ class HVACUnit(Base):
     name = Column(String, nullable=False)
     location = Column(String, nullable=False)
     status = Column(String, default="NORMAL")  # NORMAL, WARNING, CRITICAL, OFFLINE
-    installation_date = Column(DateTime, default=datetime.datetime.utcnow)
+    installation_date = Column(DateTime, default=utc_now)
 
     readings = relationship("SensorReading", back_populates="unit")
     predictions = relationship("Prediction", back_populates="unit")
@@ -38,7 +41,7 @@ class SensorReading(Base):
     pressure = Column(Float, nullable=False)
     current = Column(Float, nullable=False)
     power = Column(Float, nullable=False)
-    timestamp = Column(DateTime, default=datetime.datetime.utcnow, index=True)
+    timestamp = Column(DateTime, default=utc_now, index=True)
 
     unit = relationship("HVACUnit", back_populates="readings")
     prediction = relationship("Prediction", back_populates="reading", uselist=False)
@@ -56,7 +59,7 @@ class Prediction(Base):
     severity = Column(String, nullable=False)          # Low, Medium, High, Critical
     health_score = Column(Float, nullable=False)      # 0 - 100
     recommended_action = Column(Text, nullable=True)
-    timestamp = Column(DateTime, default=datetime.datetime.utcnow, index=True)
+    timestamp = Column(DateTime, default=utc_now, index=True)
 
     unit = relationship("HVACUnit", back_populates="predictions")
     reading = relationship("SensorReading", back_populates="prediction")
@@ -73,7 +76,7 @@ class Alert(Base):
     is_resolved = Column(Boolean, default=False, index=True)
     resolved_at = Column(DateTime, nullable=True)
     resolved_by = Column(String, nullable=True)
-    timestamp = Column(DateTime, default=datetime.datetime.utcnow, index=True)
+    timestamp = Column(DateTime, default=utc_now, index=True)
 
     unit = relationship("HVACUnit", back_populates="alerts")
 
@@ -84,7 +87,7 @@ class SimulationEvent(Base):
     scenario = Column(String, nullable=False) # NORMAL, FILTER_CLOGGING, COMPRESSOR_OVERLOAD, REFRIGERANT_LEAKAGE, RANDOM_FAULT
     speed_multiplier = Column(Float, default=1.0)
     is_active = Column(Boolean, default=True)
-    started_at = Column(DateTime, default=datetime.datetime.utcnow)
+    started_at = Column(DateTime, default=utc_now)
     stopped_at = Column(DateTime, nullable=True)
 
 class SystemSettings(Base):
@@ -93,7 +96,7 @@ class SystemSettings(Base):
     id = Column(Integer, primary_key=True, index=True)
     setting_key = Column(String, unique=True, index=True, nullable=False)
     setting_value = Column(Text, nullable=False)
-    updated_at = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow)
+    updated_at = Column(DateTime, default=utc_now, onupdate=utc_now)
 
 class EnergyRecord(Base):
     __tablename__ = "energy_records"
@@ -104,4 +107,4 @@ class EnergyRecord(Base):
     total_kwh = Column(Float, default=0.0)
     peak_power_w = Column(Float, default=0.0)
     avg_power_w = Column(Float, default=0.0)
-    timestamp = Column(DateTime, default=datetime.datetime.utcnow)
+    timestamp = Column(DateTime, default=utc_now)

@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -17,8 +17,8 @@ def get_energy_summary(unit_id: str = "HVAC-001", db: Session = Depends(get_db))
 
     current_power = latest_reading.power if latest_reading else 1050.0
 
-    now = datetime.utcnow()
-    today_start = datetime(now.year, now.month, now.day)
+    now = datetime.now(timezone.utc)
+    today_start = datetime(now.year, now.month, now.day, tzinfo=timezone.utc)
     week_start = now - timedelta(days=7)
 
     # Average and Peak power today

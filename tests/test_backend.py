@@ -64,3 +64,33 @@ def test_energy_summary():
     data = response.json()
     assert "current_power_w" in data
     assert "recommendation" in data
+
+def test_auth_login():
+    response = client.post("/api/auth/login", data={"username": "admin@hvac.com", "password": "admin123"})
+    assert response.status_code == 200
+    data = response.json()
+    assert "access_token" in data
+    assert data["token_type"] == "bearer"
+
+def test_sensors_latest():
+    response = client.get("/api/sensors/latest")
+    assert response.status_code == 200
+    data = response.json()
+    assert "temperature" in data
+    assert "humidity" in data
+    assert "pressure" in data
+    assert "current" in data
+    assert "power" in data
+
+def test_predictions_latest():
+    response = client.get("/api/predictions/latest")
+    assert response.status_code == 200
+    data = response.json()
+    assert "predicted_fault" in data
+    assert "health_score" in data
+    assert "severity" in data
+
+def test_alerts_endpoint():
+    response = client.get("/api/alerts")
+    assert response.status_code == 200
+    assert isinstance(response.json(), list)

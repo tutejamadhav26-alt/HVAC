@@ -1,5 +1,5 @@
 from typing import List, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 from database import get_db
@@ -25,7 +25,7 @@ def get_sensor_history(
     limit: int = Query(200, ge=1, le=1000),
     db: Session = Depends(get_db)
 ):
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     delta_map = {
         "1h": timedelta(hours=1),
         "6h": timedelta(hours=6),

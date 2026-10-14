@@ -9,7 +9,10 @@ import os
 import json
 import joblib
 import numpy as np
-import pandas as pd
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
 
 MODEL_DIR = os.path.join(os.path.dirname(__file__), "models")
 

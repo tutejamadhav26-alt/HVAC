@@ -144,7 +144,7 @@ class HVACSimulator:
                 pressure=round(float(self.curr_press), 2),
                 current=round(float(self.curr_current), 2),
                 power=round(float(self.curr_power), 2),
-                timestamp=datetime.datetime.utcnow()
+                timestamp=datetime.datetime.now(datetime.timezone.utc)
             )
             db.add(reading)
             db.commit()
@@ -169,7 +169,7 @@ class HVACSimulator:
                 severity=pred_dict["severity"],
                 health_score=pred_dict["health_score"],
                 recommended_action=pred_dict["recommended_action"],
-                timestamp=datetime.datetime.utcnow()
+                timestamp=datetime.datetime.now(datetime.timezone.utc)
             )
             db.add(prediction)
 
@@ -205,7 +205,7 @@ class HVACSimulator:
                         message=f"ML Anomaly Score {pred_dict['anomaly_score']} with {pred_dict['confidence']}% confidence. {pred_dict['recommended_action']}",
                         severity=alert_severity,
                         is_resolved=False,
-                        timestamp=datetime.datetime.utcnow()
+                        timestamp=datetime.datetime.now(datetime.timezone.utc)
                     )
                     db.add(alert)
                     db.commit()

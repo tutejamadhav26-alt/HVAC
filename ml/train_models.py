@@ -13,6 +13,8 @@ import pandas as pd
 from sklearn.ensemble import IsolationForest, RandomForestClassifier, RandomForestRegressor
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.model_selection import train_test_split
+import sys
+sys.path.insert(0, os.path.dirname(__file__))
 from generate_dataset import generate_hvac_dataset
 
 def train_hvac_models():

@@ -1,5 +1,5 @@
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from database import get_db
@@ -32,7 +32,7 @@ def resolve_alert(
         raise HTTPException(status_code=404, detail="Alert not found")
 
     alert.is_resolved = True
-    alert.resolved_at = datetime.utcnow()
+    alert.resolved_at = datetime.now(timezone.utc)
     alert.resolved_by = request.resolved_by or "Staff"
     db.commit()
     db.refresh(alert)
