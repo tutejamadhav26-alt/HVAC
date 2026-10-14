@@ -78,6 +78,8 @@ class MQTTManager:
         press = float(data.get("pressure", 101.3))
         curr = float(data.get("current", 4.8))
         pow_w = float(data.get("power", curr * 220.0))
+        occupancy = int(data.get("occupancy", 0))
+        outdoor = float(data.get("outdoor_temp", 32.0))
 
         db = SessionLocal()
         try:
@@ -88,6 +90,9 @@ class MQTTManager:
                     unit_id=unit_id,
                     name=f"ESP32 Unit ({unit_id})",
                     location="Hardware Sensor Location",
+                    building_floor="Floor 1",
+                    zone_type="Commercial Workspace",
+                    brand="Daikin",
                     status="NORMAL"
                 )
                 db.add(hvac_unit)
@@ -101,6 +106,8 @@ class MQTTManager:
                 pressure=press,
                 current=curr,
                 power=pow_w,
+                occupancy=occupancy,
+                outdoor_temp=outdoor,
                 timestamp=datetime.datetime.now(datetime.timezone.utc)
             )
             db.add(reading)
@@ -108,7 +115,7 @@ class MQTTManager:
             db.refresh(reading)
 
             # Perform ML Inference
-            pred_dict = ml_engine.predict(temp, hum, press, curr, pow_w)
+            pred_dict = ml_engine.predict(temp, hum, press, curr, pow_w, occupancy, outdoor)
             prediction = models.Prediction(
                 reading_id=reading.id,
                 unit_id=unit_id,

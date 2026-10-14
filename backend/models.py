@@ -24,6 +24,11 @@ class HVACUnit(Base):
     unit_id = Column(String, unique=True, index=True, nullable=False)  # e.g., 'HVAC-001'
     name = Column(String, nullable=False)
     location = Column(String, nullable=False)
+    building_floor = Column(String, default="Floor 2")
+    zone_type = Column(String, default="Commercial Office / Conference")
+    brand = Column(String, default="Daikin")  # Daikin, Carrier, Panasonic, Toshiba, Mitsubishi, LG, Voltas
+    current_setpoint = Column(Float, default=24.0)
+    current_mode = Column(String, default="AUTO")
     status = Column(String, default="NORMAL")  # NORMAL, WARNING, CRITICAL, OFFLINE
     installation_date = Column(DateTime, default=utc_now)
 
@@ -41,6 +46,8 @@ class SensorReading(Base):
     pressure = Column(Float, nullable=False)
     current = Column(Float, nullable=False)
     power = Column(Float, nullable=False)
+    occupancy = Column(Integer, default=0, nullable=False)     # Number of detected occupants
+    outdoor_temp = Column(Float, default=32.0, nullable=False)  # Ambient outdoor temperature in °C
     timestamp = Column(DateTime, default=utc_now, index=True)
 
     unit = relationship("HVACUnit", back_populates="readings")
@@ -59,6 +66,15 @@ class Prediction(Base):
     severity = Column(String, nullable=False)          # Low, Medium, High, Critical
     health_score = Column(Float, nullable=False)      # 0 - 100
     recommended_action = Column(Text, nullable=True)
+
+    # Intelligent Universal Remote Control Recommendations
+    recommended_mode = Column(String, default="AUTO")    # COOL, DRY, AUTO, FAN, TURBO, ECO
+    target_temperature = Column(Float, default=24.0)     # Recommended setpoint (°C)
+    fan_speed = Column(String, default="AUTO")           # LOW, MED, HIGH, AUTO
+    energy_saving_pct = Column(Float, default=15.0)      # % power savings predicted
+    comfort_index = Column(Float, default=92.0)          # Thermal comfort index 0-100
+    dew_point = Column(Float, default=13.5)              # Psychrometric dew point (°C)
+    cop_estimate = Column(Float, default=3.4)            # Coefficient of performance
     timestamp = Column(DateTime, default=utc_now, index=True)
 
     unit = relationship("HVACUnit", back_populates="predictions")

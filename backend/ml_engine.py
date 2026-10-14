@@ -50,17 +50,30 @@ class MLEngine:
             print(f"[-] MLEngine: Error loading models: {e}. Falling back to rule-based engine.")
             self.models_loaded = False
 
-    def predict(self, temperature: float, humidity: float, pressure: float, current: float, power: float) -> dict:
-        features = np.array([[temperature, humidity, pressure, current, power]])
+    def predict(
+        self,
+        temperature: float,
+        humidity: float,
+        pressure: float,
+        current: float,
+        power: float,
+        occupancy: int = 5,
+        outdoor_temp: float = 32.0
+    ) -> dict:
+        expected_features = getattr(self.scaler, 'n_features_in_', 7) if self.scaler else 7
+        if expected_features == 7:
+            features = np.array([[temperature, humidity, pressure, current, power, float(occupancy), float(outdoor_temp)]])
+        else:
+            features = np.array([[temperature, humidity, pressure, current, power]])
         
+        predicted_power_next = round(float(power), 2)
+
         if self.models_loaded:
             try:
                 # 1. Anomaly Detection
                 features_scaled = self.scaler.transform(features)
                 iso_res = self.iso_forest.predict(features_scaled)[0]
-                # anomaly_score range: negative indicates anomaly, positive indicates normal
                 decision_func = float(self.iso_forest.decision_function(features_scaled)[0])
-                # Normalize decision function to anomaly score (0.0 normal -> 1.0 extreme anomaly)
                 anomaly_score = max(0.0, min(1.0, float(0.5 - decision_func)))
                 is_anomaly = bool(iso_res == -1 or anomaly_score > 0.45)
 
@@ -70,16 +83,20 @@ class MLEngine:
                 predicted_fault = str(self.label_encoder.inverse_transform([fault_pred_idx])[0])
                 confidence = float(np.max(fault_probs))
 
+                # 3. Power Forecast
+                if self.power_forecaster:
+                    predicted_power_next = round(float(self.power_forecaster.predict(features)[0]), 2)
+
             except Exception as err:
                 print(f"[-] ML Inference error: {err}. Using physics fallback.")
-                return self._physics_fallback_predict(temperature, humidity, pressure, current, power)
+                return self._physics_fallback_predict(temperature, humidity, pressure, current, power, occupancy, outdoor_temp)
         else:
-            return self._physics_fallback_predict(temperature, humidity, pressure, current, power)
+            return self._physics_fallback_predict(temperature, humidity, pressure, current, power, occupancy, outdoor_temp)
 
         # Determine Severity & Recommended Action
         severity, action = self._determine_severity_and_action(predicted_fault, confidence, anomaly_score, temperature, current, pressure)
 
-        # 3. Dynamic Health Score Calculation (0 - 100)
+        # 4. Dynamic Health Score Calculation (0 - 100)
         health_score = self._calculate_health_score(predicted_fault, confidence, anomaly_score, temperature, current, pressure)
 
         return {
@@ -89,10 +106,14 @@ class MLEngine:
             "confidence": round(confidence * 100, 2), # percentage 0-100
             "severity": severity,
             "health_score": round(health_score, 1),
-            "recommended_action": action
+            "recommended_action": action,
+            "predicted_power_next": predicted_power_next
         }
 
-    def _physics_fallback_predict(self, temp: float, hum: float, press: float, curr: float, pow_w: float) -> dict:
+    def _physics_fallback_predict(
+        self, temp: float, hum: float, press: float, curr: float, pow_w: float,
+        occupancy: int = 5, outdoor_temp: float = 32.0
+    ) -> dict:
         predicted_fault = "normal"
         confidence = 0.95
         anomaly_score = 0.05
@@ -124,7 +145,8 @@ class MLEngine:
             "confidence": round(confidence * 100, 2),
             "severity": severity,
             "health_score": round(health_score, 1),
-            "recommended_action": action
+            "recommended_action": action,
+            "predicted_power_next": round(pow_w * 1.02, 2)
         }
 
     def _determine_severity_and_action(self, fault: str, confidence: float, anomaly_score: float, temp: float, curr: float, press: float):

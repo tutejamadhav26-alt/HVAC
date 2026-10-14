@@ -4,7 +4,9 @@
     "humidity",
     "pressure",
     "current",
-    "power"
+    "power",
+    "occupancy",
+    "outdoor_temp"
   ],
   "fault_classes": [
     "compressor_overload",
@@ -12,6 +14,6 @@
     "normal",
     "refrigerant_leakage"
   ],
-  "trained_at": "2026-09-21T15:45:43.501819",
-  "num_samples": 5000
+  "trained_at": "2026-10-14T09:06:15.387400+00:00",
+  "num_samples": 15000
 }

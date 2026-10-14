@@ -109,3 +109,36 @@ export function createWebSocketConnection(onMessageCallback) {
     if (ws) ws.close();
   };
 }
+
+export async function fetchRemoteRecommendation(unitId = 'HVAC-001', brand = null) {
+  const url = brand 
+    ? `${API_BASE_URL}/api/commercial/remote-recommendation?unit_id=${unitId}&brand=${encodeURIComponent(brand)}`
+    : `${API_BASE_URL}/api/commercial/remote-recommendation?unit_id=${unitId}`;
+  const res = await fetch(url);
+  return res.json();
+}
+
+export async function applyRemoteCommand(commandData) {
+  const res = await fetch(`${API_BASE_URL}/api/commercial/apply-remote`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(commandData)
+  });
+  return res.json();
+}
+
+export async function fetchTechnicianDiagnostics(unitId = 'HVAC-001') {
+  const res = await fetch(`${API_BASE_URL}/api/commercial/technician-diagnostics?unit_id=${unitId}`);
+  return res.json();
+}
+
+export async function fetchROIAnalytics(unitId = 'HVAC-001', currency = 'INR') {
+  const res = await fetch(`${API_BASE_URL}/api/commercial/roi?unit_id=${unitId}&currency=${currency}`);
+  return res.json();
+}
+
+export async function fetchBuildingZones() {
+  const res = await fetch(`${API_BASE_URL}/api/commercial/zones`);
+  return res.json();
+}
+
