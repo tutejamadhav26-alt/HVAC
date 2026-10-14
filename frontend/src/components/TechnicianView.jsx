@@ -23,21 +23,21 @@ export default function TechnicianView({ unitId = 'HVAC-001', sensorData }) {
     return () => clearInterval(interval);
   }, [unitId]);
 
-  const temp = sensorData?.temperature ?? diagnostics?.temperature_c ?? 24.0;
-  const hum = sensorData?.humidity ?? diagnostics?.humidity_pct ?? 50.0;
-  const press = sensorData?.pressure ?? diagnostics?.pressure_kpa ?? 101.3;
-  const curr = sensorData?.current ?? diagnostics?.current_a ?? 4.8;
-  const power = sensorData?.power ?? diagnostics?.power_w ?? 1050.0;
+  const temp = Number(sensorData?.temperature ?? diagnostics?.temperature_c ?? 24.0);
+  const hum = Number(sensorData?.humidity ?? diagnostics?.humidity_pct ?? 50.0);
+  const press = Number(sensorData?.pressure ?? diagnostics?.pressure_kpa ?? 101.3);
+  const curr = Number(sensorData?.current ?? diagnostics?.current_a ?? 4.8);
+  const power = Number(sensorData?.power ?? diagnostics?.power_w ?? 1050.0);
 
-  const dewPoint = diagnostics?.dew_point_c ?? 12.9;
-  const wetBulb = diagnostics?.wet_bulb_c ?? 17.1;
-  const enthalpy = diagnostics?.enthalpy_kj_kg ?? 48.2;
-  const superheat = diagnostics?.estimated_superheat_c ?? 6.5;
-  const subcooling = diagnostics?.estimated_subcooling_c ?? 5.2;
-  const compRatio = diagnostics?.compression_ratio ?? 3.2;
-  const cop = diagnostics?.cop ?? 3.45;
-  const eer = diagnostics?.eer ?? 11.77;
-  const rlaPct = diagnostics?.rla_pct ?? 58.5;
+  const dewPoint = Number(diagnostics?.dew_point_c ?? 12.9);
+  const wetBulb = Number(diagnostics?.wet_bulb_c ?? 17.1);
+  const enthalpy = Number(diagnostics?.enthalpy_kj_kg ?? 48.2);
+  const superheat = Number(diagnostics?.estimated_superheat_c ?? 6.5);
+  const subcooling = Number(diagnostics?.estimated_subcooling_c ?? 5.2);
+  const compRatio = Number(diagnostics?.compression_ratio ?? 3.2);
+  const cop = Number(diagnostics?.cop ?? 3.45);
+  const eer = Number(diagnostics?.eer ?? 11.77);
+  const rlaPct = Number(diagnostics?.rla_pct ?? 58.5);
   const stressLevel = diagnostics?.compressor_stress_level ?? 'Nominal';
   const summary = diagnostics?.technician_summary ?? 'System operating within standard ASHRAE thermodynamic parameters.';
 

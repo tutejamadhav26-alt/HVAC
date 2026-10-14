@@ -29,9 +29,10 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
       const data = await fetchRemoteRecommendation(unitId, selectedBrand);
       if (data) {
         setRecommendation(data);
-        setTargetTemp(data.recommended_temperature);
-        setSelectedMode(data.recommended_mode);
-        setFanSpeed(data.recommended_fan_speed);
+        const temp = Number(data.target_temperature ?? data.recommended_temperature ?? 24.0);
+        setTargetTemp(!isNaN(temp) ? temp : 24.0);
+        setSelectedMode(data.recommended_mode || 'AUTO');
+        setFanSpeed(data.fan_speed || data.recommended_fan_speed || 'AUTO');
       }
     } catch (err) {
       console.error('Failed to load remote recommendation:', err);
@@ -71,12 +72,31 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
   };
 
   const adjustTemp = (delta) => {
-    setTargetTemp(prev => Math.min(30.0, Math.max(16.0, Math.round((prev + delta) * 2) / 2)));
+    setTargetTemp(prev => {
+      const curr = typeof prev === 'number' && !isNaN(prev) ? prev : 24.0;
+      return Math.min(30.0, Math.max(16.0, Math.round((curr + delta) * 2) / 2));
+    });
   };
 
-  const occupancy = sensorData?.occupancy ?? recommendation?.occupancy ?? 0;
-  const indoorTemp = sensorData?.temperature ?? 24.0;
-  const outdoorTemp = sensorData?.outdoor_temp ?? 33.0;
+  const occupancy = Number(sensorData?.occupancy ?? recommendation?.occupancy ?? 0);
+  const rawIndoor = Number(sensorData?.temperature ?? recommendation?.current_temp ?? 24.0);
+  const indoorTemp = !isNaN(rawIndoor) ? rawIndoor : 24.0;
+  
+  const rawOutdoor = Number(sensorData?.outdoor_temp ?? recommendation?.outdoor_temp ?? 33.0);
+  const outdoorTemp = !isNaN(rawOutdoor) ? rawOutdoor : 33.0;
+
+  const safeTargetTemp = typeof targetTemp === 'number' && !isNaN(targetTemp) ? targetTemp : 24.0;
+  const energySavingPct = Number(recommendation?.energy_saving_pct ?? recommendation?.energy_saving_potential_pct ?? 18.5);
+
+  const irPayload = recommendation?.brand_command?.ir_hex 
+    || recommendation?.ir_command_hex 
+    || `${selectedBrand.toUpperCase()}_CMD_${selectedMode}_${safeTargetTemp}C_${fanSpeed}`;
+
+  const modbusAddress = recommendation?.brand_command?.modbus_register 
+    || recommendation?.modbus_register_address 
+    || 'IR HEX / Modbus RTU';
+
+  const rationaleText = recommendation?.rationale || recommendation?.reason;
 
   return (
     <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl backdrop-blur-md relative overflow-hidden">
@@ -150,7 +170,7 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
           <div>
             <div className="text-[11px] uppercase tracking-wider text-slate-400 font-semibold">Projected Energy Saving</div>
             <div className="text-xl font-bold text-emerald-400 mt-0.5">
-              {recommendation?.energy_saving_potential_pct ?? 18.5}%
+              {energySavingPct.toFixed(1)}%
             </div>
           </div>
           <span className="text-xs text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded">
@@ -177,11 +197,11 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
             </button>
             <div className="text-center">
               <div className="text-5xl font-extrabold text-white tracking-tight">
-                {targetTemp.toFixed(1)}
+                {safeTargetTemp.toFixed(1)}
                 <span className="text-2xl text-cyan-400 font-normal">°C</span>
               </div>
               <div className="text-[11px] text-slate-400 mt-1">
-                AI Suggestion: <strong className="text-emerald-400">{recommendation?.recommended_temperature ?? 24.0}°C</strong>
+                AI Suggestion: <strong className="text-emerald-400">{Number(recommendation?.target_temperature ?? recommendation?.recommended_temperature ?? 24.0).toFixed(1)}°C</strong>
               </div>
             </div>
             <button
@@ -195,9 +215,9 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
 
           {/* Quick setpoint action badge */}
           <div className="text-xs text-slate-300 bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700/60 text-center">
-            {targetTemp > indoorTemp ? (
+            {safeTargetTemp > indoorTemp ? (
               <span className="text-amber-400 font-semibold">▲ Increase Setpoint (Conserve Energy)</span>
-            ) : targetTemp < indoorTemp ? (
+            ) : safeTargetTemp < indoorTemp ? (
               <span className="text-cyan-400 font-semibold">▼ Decrease Setpoint (Active Cooling)</span>
             ) : (
               <span className="text-emerald-400 font-semibold">✔ Equilibrium Reached</span>
@@ -272,10 +292,10 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
           {/* IR Protocol / Modbus Payload Preview */}
           <div className="bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs font-mono text-slate-400 flex items-center justify-between">
             <span className="text-slate-500 truncate mr-2">
-              Payload: <span className="text-cyan-400">{recommendation?.ir_command_hex || `${selectedBrand.toUpperCase()}_CMD_${selectedMode}_${targetTemp}C_${fanSpeed}`}</span>
+              Payload: <span className="text-cyan-400">{irPayload}</span>
             </span>
             <span className="text-[10px] text-slate-500 uppercase bg-slate-800 px-2 py-0.5 rounded shrink-0">
-              {recommendation?.modbus_register_address || 'IR HEX / Modbus RTU'}
+              {modbusAddress}
             </span>
           </div>
 
@@ -283,7 +303,7 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
       </div>
 
       {/* AI Thermodynamic Explanation & Reasoning */}
-      {recommendation?.reason && (
+      {rationaleText && (
         <div className="mt-4 bg-cyan-950/20 border border-cyan-800/40 rounded-xl p-3.5 flex items-start gap-3">
           <span className="p-1 rounded-lg bg-cyan-500/20 text-cyan-400 mt-0.5 shrink-0">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -292,7 +312,7 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
           </span>
           <div className="text-xs">
             <strong className="text-cyan-300 block mb-0.5">AI Thermodynamic Optimization Rationale:</strong>
-            <p className="text-slate-300 leading-relaxed">{recommendation.reason}</p>
+            <p className="text-slate-300 leading-relaxed">{rationaleText}</p>
           </div>
         </div>
       )}

@@ -22,17 +22,16 @@ export default function CommercialROIWidget({ unitId = 'HVAC-001' }) {
     loadROI();
   }, [unitId, currency]);
 
-  const symbol = currency === 'INR' ? '₹' : '$';
-  const baselineKwh = roiData?.daily_baseline_kwh ?? 24.5;
-  const optimizedKwh = roiData?.daily_optimized_kwh ?? 19.8;
-  const kwhSaved = roiData?.daily_kwh_saved ?? 4.7;
-  const pctSaved = roiData?.percent_saved ?? 19.2;
-  const dailyCostSaved = roiData?.daily_cost_saved ?? 39.95;
-  const monthlyCostSaved = roiData?.monthly_cost_saved ?? 1198.5;
-  const annualCostSaved = roiData?.annual_cost_saved ?? 14580.0;
-  const co2Daily = roiData?.co2_avoided_kg_daily ?? 3.85;
-  const co2Monthly = roiData?.co2_avoided_kg_monthly ?? 115.5;
-  const treesEquiv = roiData?.equivalent_trees_planted ?? 5.5;
+  const symbol = roiData?.currency_symbol ?? (currency === 'INR' ? '₹' : '$');
+  const baselineKwh = Number(roiData?.daily_energy_kwh ?? roiData?.daily_baseline_kwh ?? 24.5);
+  const pctSaved = Number(roiData?.occupancy_driven_savings_pct ?? roiData?.percent_saved ?? 28.0);
+  const kwhSaved = Number(roiData?.daily_kwh_saved ?? (baselineKwh * pctSaved / 100.0));
+  const optimizedKwh = Number(roiData?.daily_optimized_kwh ?? Math.max(0, baselineKwh - kwhSaved));
+  const dailyCostSaved = Number(roiData?.daily_savings ?? roiData?.daily_cost_saved ?? 66.64);
+  const monthlyCostSaved = Number(roiData?.monthly_savings_projection ?? roiData?.monthly_cost_saved ?? 1999.2);
+  const annualCostSaved = Number(roiData?.annual_cost_saved ?? monthlyCostSaved * 12);
+  const co2Monthly = Number(roiData?.co2_saved_kg_monthly ?? roiData?.co2_avoided_kg_monthly ?? 159.9);
+  const treesEquiv = Math.max(1, Math.round(co2Monthly / 21.7 * 10) / 10);
 
   return (
     <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-xl backdrop-blur-md relative overflow-hidden">
