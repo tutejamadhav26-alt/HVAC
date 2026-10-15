@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   LayoutDashboard, 
@@ -13,19 +13,26 @@ import {
   Sun,
   Moon,
   Menu,
-  X
+  X,
+  LogOut,
+  LogIn,
+  UserCheck,
+  Sparkles
 } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function Navbar() {
   const { latestPrediction, simulation } = useData();
   const { theme, toggleTheme } = useTheme();
+  const { user, isAuthenticated, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [hoveredPath, setHoveredPath] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const navItems = [
+  const authNavItems = [
     { to: '/', label: 'Overview', icon: LayoutDashboard },
     { to: '/live', label: 'Live Telemetry', icon: Activity },
     { to: '/ai', label: 'AI Predict', icon: BrainCircuit },
@@ -36,11 +43,23 @@ export default function Navbar() {
     { to: '/system', label: 'System', icon: Info },
   ];
 
+  const publicNavItems = [
+    { to: '/welcome', label: 'Platform Overview', icon: Sparkles },
+    { to: '/login', label: 'Enterprise Sign In', icon: LogIn }
+  ];
+
+  const navItems = isAuthenticated ? authNavItems : publicNavItems;
+
   const getStatusDot = () => {
     const sev = latestPrediction?.severity;
     if (sev === 'Critical') return 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.7)]';
     if (sev === 'High' || sev === 'Medium') return 'bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.7)]';
     return 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.7)]';
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/welcome');
   };
 
   return (
@@ -67,7 +86,7 @@ export default function Navbar() {
           
           {/* Left: Minimalist AirconIQ Branding */}
           <NavLink 
-            to="/" 
+            to={isAuthenticated ? "/" : "/welcome"} 
             className="flex items-center gap-2.5 py-1.5 px-3 rounded-2xl bg-white/70 dark:bg-[#121212]/80 backdrop-blur-xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm hover:border-zinc-300 dark:hover:border-zinc-700 transition"
           >
             <img 
@@ -151,16 +170,38 @@ export default function Navbar() {
             </div>
           </nav>
 
-          {/* Right: Minimalist Controls (Theme Switcher + Status) */}
+          {/* Right: Minimalist Controls (Auth Profile + Theme Switcher) */}
           <div className="flex items-center gap-2">
             
-            {/* Live Status Pill */}
-            <div className="hidden sm:flex items-center gap-2 py-1.5 px-3 rounded-full bg-white/70 dark:bg-[#121212]/80 backdrop-blur-xl border border-zinc-200/80 dark:border-zinc-800/80 shadow-sm text-xs font-semibold">
-              <span className={`w-2 h-2 rounded-full ${getStatusDot()} animate-pulse`} />
-              <span className="text-zinc-600 dark:text-zinc-300 text-[11px] font-mono">
-                {simulation.scenario || 'NORMAL'}
-              </span>
-            </div>
+            {/* Authenticated User Role Badge & Logout */}
+            {isAuthenticated ? (
+              <div className="flex items-center gap-1.5 bg-white/70 dark:bg-[#121212]/80 backdrop-blur-xl border border-zinc-200/80 dark:border-zinc-800/80 p-1 pl-2.5 rounded-full shadow-sm">
+                <div className="flex items-center gap-1.5 text-xs">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="font-bold text-zinc-900 dark:text-zinc-100 hidden sm:inline truncate max-w-[100px]">
+                    {user?.full_name?.split(' ')[0] || user?.email?.split('@')[0]}
+                  </span>
+                  <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.2 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                    {user?.role || 'Staff'}
+                  </span>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="p-1.5 rounded-full hover:bg-red-50 dark:hover:bg-red-950/30 text-zinc-500 hover:text-red-500 transition"
+                  title="Sign Out"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            ) : (
+              <NavLink
+                to="/login"
+                className="py-1.5 px-3 rounded-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider shadow-sm transition flex items-center gap-1.5"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>Sign In</span>
+              </NavLink>
+            )}
 
             {/* Theme Toggle Button */}
             <button

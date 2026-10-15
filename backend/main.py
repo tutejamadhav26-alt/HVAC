@@ -43,25 +43,23 @@ def seed_initial_data():
     db = SessionLocal()
     try:
         # 1. Seed Default Users
-        admin_user = db.query(models.User).filter(models.User.email == "admin@hvac.com").first()
-        if not admin_user:
-            admin_user = models.User(
-                email="admin@hvac.com",
-                hashed_password=get_password_hash("admin123"),
-                full_name="Facility Administrator",
-                role="admin"
-            )
-            db.add(admin_user)
-
-        staff_user = db.query(models.User).filter(models.User.email == "staff@hvac.com").first()
-        if not staff_user:
-            staff_user = models.User(
-                email="staff@hvac.com",
-                hashed_password=get_password_hash("staff123"),
-                full_name="Facility Technician",
-                role="staff"
-            )
-            db.add(staff_user)
+        demo_users = [
+            ("admin@airconiq.ai", "admin123", "Director of Facilities", "admin"),
+            ("tech@airconiq.ai", "tech123", "Chief Diagnostic Engineer", "technician"),
+            ("auditor@airconiq.ai", "audit123", "ESG Energy Auditor", "auditor"),
+            ("admin@hvac.com", "admin123", "Facility Administrator", "admin"),
+            ("staff@hvac.com", "staff123", "Facility Technician", "staff")
+        ]
+        for email, pwd, name, role in demo_users:
+            u = db.query(models.User).filter(models.User.email == email).first()
+            if not u:
+                u = models.User(
+                    email=email,
+                    hashed_password=get_password_hash(pwd),
+                    full_name=name,
+                    role=role
+                )
+                db.add(u)
 
         # 2. Seed Default HVAC Unit
         unit = db.query(models.HVACUnit).filter(models.HVACUnit.unit_id == "HVAC-001").first()
