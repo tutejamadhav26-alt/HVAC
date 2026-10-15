@@ -184,6 +184,87 @@ html:not(.dark) .text-slate-500 {
   color: #71717a !important;
 }
 
+/* Color Contrast Synchronization in Light Mode */
+html:not(.dark) .text-cyan-300,
+html:not(.dark) .text-cyan-400 {
+  color: #0284c7 !important; /* Deep rich sky blue */
+}
+
+html:not(.dark) .text-teal-300,
+html:not(.dark) .text-teal-400 {
+  color: #0f766e !important; /* Deep rich teal */
+}
+
+html:not(.dark) .text-blue-300,
+html:not(.dark) .text-blue-400 {
+  color: #1d4ed8 !important; /* Deep rich royal blue */
+}
+
+html:not(.dark) .text-emerald-300,
+html:not(.dark) .text-emerald-400,
+html:not(.dark) .text-green-300,
+html:not(.dark) .text-green-400 {
+  color: #047857 !important; /* Deep rich emerald */
+}
+
+html:not(.dark) .text-amber-300,
+html:not(.dark) .text-amber-400 {
+  color: #b45309 !important; /* Deep rich bronze/amber */
+}
+
+html:not(.dark) .text-purple-300,
+html:not(.dark) .text-purple-400 {
+  color: #7e22ce !important; /* Deep rich violet */
+}
+
+html:not(.dark) .text-red-300,
+html:not(.dark) .text-red-400 {
+  color: #dc2626 !important; /* Deep rich crimson */
+}
+
+/* Light mode tints for AI banners, callout boxes & badges */
+html:not(.dark) .bg-cyan-950\/20,
+html:not(.dark) .bg-cyan-950\/30,
+html:not(.dark) .bg-cyan-900\/20 {
+  background-color: #f0f9ff !important;
+}
+
+html:not(.dark) .border-cyan-800\/40,
+html:not(.dark) .border-cyan-800\/30,
+html:not(.dark) .border-cyan-900\/50 {
+  border-color: #bae6fd !important;
+}
+
+html:not(.dark) .bg-emerald-950\/30,
+html:not(.dark) .bg-emerald-950\/20 {
+  background-color: #ecfdf5 !important;
+}
+
+html:not(.dark) .border-emerald-500\/40,
+html:not(.dark) .border-emerald-800\/30 {
+  border-color: #a7f3d0 !important;
+}
+
+html:not(.dark) .bg-amber-950\/30,
+html:not(.dark) .bg-amber-950\/20 {
+  background-color: #fffbeb !important;
+}
+
+html:not(.dark) .border-amber-500\/40,
+html:not(.dark) .border-amber-800\/30 {
+  border-color: #fde68a !important;
+}
+
+html:not(.dark) .bg-red-950\/30,
+html:not(.dark) .bg-red-950\/20 {
+  background-color: #fef2f2 !important;
+}
+
+html:not(.dark) .border-red-500\/40,
+html:not(.dark) .border-red-800\/30 {
+  border-color: #fecaca !important;
+}
+
 /* CRITICAL FIX FOR USER SCREENSHOT: Inactive control buttons in Light Mode */
 html:not(.dark) .bg-slate-700 {
   background-color: #f4f4f5 !important;
