@@ -161,9 +161,6 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
               {indoorTemp.toFixed(1)}°C <span className="text-xs font-normal text-slate-400">/ {outdoorTemp.toFixed(1)}°C</span>
             </div>
           </div>
-          <span className="text-xs font-medium text-slate-400 bg-slate-900/60 px-2.5 py-1 rounded-lg">
-            ΔT: {(outdoorTemp - indoorTemp).toFixed(1)}°C
-          </span>
         </div>
 
         <div className="bg-slate-800/60 border border-slate-700/60 rounded-xl p-3 flex items-center justify-between">
@@ -173,9 +170,6 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
               {energySavingPct.toFixed(1)}%
             </div>
           </div>
-          <span className="text-xs text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded">
-            ASHRAE-55 Optimal
-          </span>
         </div>
       </div>
 
@@ -289,15 +283,7 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
             </div>
           </div>
 
-          {/* IR Protocol / Modbus Payload Preview */}
-          <div className="bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs font-mono text-slate-400 flex items-center justify-between">
-            <span className="text-slate-500 truncate mr-2">
-              Payload: <span className="text-cyan-400">{irPayload}</span>
-            </span>
-            <span className="text-[10px] text-slate-500 uppercase bg-slate-800 px-2 py-0.5 rounded shrink-0">
-              {modbusAddress}
-            </span>
-          </div>
+
 
         </div>
       </div>
