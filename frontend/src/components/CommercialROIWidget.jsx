@@ -150,29 +150,7 @@ export default function CommercialROIWidget({ unitId = 'HVAC-001' }) {
 
       </div>
 
-      {/* Commercial Business Model Summary Banner */}
-      <div className="bg-gradient-to-r from-emerald-950/40 to-slate-900 border border-emerald-800/30 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-sm shrink-0">
-            ROI
-          </div>
-          <div>
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-              Commercial Enterprise B2B SaaS Proposition
-            </h4>
-            <p className="text-xs text-slate-300 mt-0.5">
-              Payback period: <strong className="text-emerald-400">3.8 Months</strong>. Saves up to 22% building energy overhead via occupancy-responsive thermostat setbacks.
-            </p>
-          </div>
-        </div>
 
-        <div className="flex items-center gap-2 shrink-0">
-          <span className="text-xs text-slate-400 font-medium">BEMS Status:</span>
-          <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
-            Ready for Commercial Deployment
-          </span>
-        </div>
-      </div>
 
     </div>
   );
