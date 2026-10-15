@@ -11,12 +11,16 @@ import {
   Cpu, 
   Settings, 
   Info,
-  Flame
+  Flame,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useData } from '../context/DataContext';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Navbar() {
   const { latestPrediction, simulation } = useData();
+  const { theme, toggleTheme } = useTheme();
 
   const getStatusBadge = () => {
     const sev = latestPrediction.severity;
@@ -85,6 +89,32 @@ export default function Navbar() {
           );
         })}
       </nav>
+
+      {/* Theme Switcher Toggle */}
+      <div className="p-3 border-t border-slate-800">
+        <button
+          onClick={toggleTheme}
+          className="w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800/80 hover:bg-slate-700/80 text-slate-300 transition border border-slate-700/60"
+          title="Toggle Light / Dark Theme"
+        >
+          <span className="flex items-center gap-2">
+            {theme === 'light' ? (
+              <>
+                <Sun className="w-4 h-4 text-amber-500" />
+                <span>Light Theme</span>
+              </>
+            ) : (
+              <>
+                <Moon className="w-4 h-4 text-cyan-400" />
+                <span>Dark Theme</span>
+              </>
+            )}
+          </span>
+          <span className="text-[10px] px-2 py-0.5 rounded bg-blue-600 text-white font-bold">
+            Switch
+          </span>
+        </button>
+      </div>
 
       {/* Footer */}
       <div className="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">

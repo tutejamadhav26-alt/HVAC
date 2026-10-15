@@ -7,12 +7,14 @@ import TechnicianView from '../components/TechnicianView';
 import CommercialROIWidget from '../components/CommercialROIWidget';
 import { 
   Thermometer, Droplets, Gauge, Zap, Activity, AlertTriangle, 
-  PlayCircle, Users, Sun, Wrench, Building2, Cpu
+  PlayCircle, Users, Sun, Moon, Wrench, Building2, Cpu
 } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
+import { useTheme } from '../context/ThemeContext';
 
 export default function Dashboard() {
   const { latestReading, latestPrediction, alerts, simulation, telemetryHistory, triggerScenario } = useData();
+  const { theme, toggleTheme } = useTheme();
   const [activeTab, setActiveTab] = useState('facility'); // 'facility' | 'technician'
 
   const occupancyCount = latestReading.occupancy ?? 6;
@@ -34,30 +36,52 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* View Mode Switcher: Facility Manager vs Technician */}
-        <div className="flex items-center bg-slate-900 border border-slate-700/80 p-1.5 rounded-xl shadow-lg">
+        {/* Right Action Controls: Theme Switcher + View Mode Switcher */}
+        <div className="flex flex-wrap items-center gap-3">
+          {/* Light / Dark Mode Toggle */}
           <button
-            onClick={() => setActiveTab('facility')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition ${
-              activeTab === 'facility'
-                ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
+            onClick={toggleTheme}
+            className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 border border-slate-700/80 hover:border-slate-500 text-slate-200 transition shadow-md"
+            title="Toggle Light / Dark Mode"
           >
-            <Building2 className="w-4 h-4" />
-            <span>Facility & Remote Dispatch</span>
+            {theme === 'light' ? (
+              <>
+                <Sun className="w-4 h-4 text-amber-500" />
+                <span>Light Mode</span>
+              </>
+            ) : (
+              <>
+                <Moon className="w-4 h-4 text-cyan-400" />
+                <span>Dark Mode</span>
+              </>
+            )}
           </button>
-          <button
-            onClick={() => setActiveTab('technician')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition ${
-              activeTab === 'technician'
-                ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-md'
-                : 'text-slate-400 hover:text-slate-200'
-            }`}
-          >
-            <Wrench className="w-4 h-4" />
-            <span>Technician Diagnostics</span>
-          </button>
+
+          {/* View Mode Switcher: Facility Manager vs Technician */}
+          <div className="flex items-center bg-slate-900 border border-slate-700/80 p-1.5 rounded-xl shadow-lg">
+            <button
+              onClick={() => setActiveTab('facility')}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition ${
+                activeTab === 'facility'
+                  ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-md'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Building2 className="w-4 h-4" />
+              <span>Facility & Remote Dispatch</span>
+            </button>
+            <button
+              onClick={() => setActiveTab('technician')}
+              className={`flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-bold transition ${
+                activeTab === 'technician'
+                  ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-md'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              <Wrench className="w-4 h-4" />
+              <span>Technician Diagnostics</span>
+            </button>
+          </div>
         </div>
       </div>
 
