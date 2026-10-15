@@ -7,12 +7,12 @@ const BRANDS = [
 ];
 
 const MODES = [
-  { id: 'COOL', label: 'Cool', color: 'bg-blue-500/20 text-blue-400 border-blue-500/40' },
-  { id: 'AUTO', label: 'Auto AI', color: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40' },
-  { id: 'DRY', label: 'Dry (Dehum)', color: 'bg-teal-500/20 text-teal-400 border-teal-500/40' },
-  { id: 'FAN', label: 'Fan Only', color: 'bg-indigo-500/20 text-indigo-400 border-indigo-500/40' },
-  { id: 'TURBO', label: 'Turbo Max', color: 'bg-red-500/20 text-red-400 border-red-500/40' },
-  { id: 'ECO', label: 'Eco Saver', color: 'bg-green-500/20 text-green-400 border-green-500/40' }
+  { id: 'COOL', label: 'Cool', color: 'bg-blue-600 !text-white border-blue-500 shadow-md font-bold' },
+  { id: 'AUTO', label: 'Auto AI', color: 'bg-emerald-600 !text-white border-emerald-500 shadow-md font-bold' },
+  { id: 'DRY', label: 'Dry (Dehum)', color: 'bg-teal-600 !text-white border-teal-500 shadow-md font-bold' },
+  { id: 'FAN', label: 'Fan Only', color: 'bg-indigo-600 !text-white border-indigo-500 shadow-md font-bold' },
+  { id: 'TURBO', label: 'Turbo Max', color: 'bg-red-600 !text-white border-red-500 shadow-md font-bold' },
+  { id: 'ECO', label: 'Eco Saver', color: 'bg-green-600 !text-white border-green-500 shadow-md font-bold' }
 ];
 
 export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData, onCommandApplied }) {
@@ -248,10 +248,10 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
                   <button
                     key={mode.id}
                     onClick={() => setSelectedMode(mode.id)}
-                    className={`py-2 px-2.5 rounded-xl text-xs font-semibold border transition text-center relative ${
+                    className={`py-2 px-2.5 rounded-xl text-xs font-bold border transition text-center relative ${
                       isSelected
-                        ? `${mode.color} border-current ring-2 ring-cyan-400/30`
-                        : 'bg-slate-800/50 text-slate-400 border-slate-700/60 hover:bg-slate-800 hover:text-slate-200'
+                        ? `${mode.color} border-current ring-2 ring-blue-500/30`
+                        : 'bg-zinc-100 dark:bg-zinc-850 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-300 border-zinc-300 dark:border-zinc-700'
                     }`}
                   >
                     {mode.label}
@@ -269,7 +269,7 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
 
           {/* Fan Speed */}
           <div>
-            <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider block mb-2">
+            <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider block mb-2">
               Blower Fan Speed
             </span>
             <div className="flex items-center gap-2">
@@ -277,10 +277,10 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
                 <button
                   key={speed}
                   onClick={() => setFanSpeed(speed)}
-                  className={`flex-1 py-1.5 rounded-lg text-xs font-medium border transition ${
+                  className={`flex-1 py-1.5 rounded-lg text-xs font-bold border transition ${
                     fanSpeed === speed
-                      ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40 font-bold'
-                      : 'bg-slate-800/40 text-slate-400 border-slate-700/60 hover:bg-slate-800 hover:text-slate-300'
+                      ? 'bg-blue-600 !text-white border-blue-500 shadow-sm'
+                      : 'bg-zinc-100 dark:bg-zinc-850 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-300 border-zinc-300 dark:border-zinc-700'
                   }`}
                 >
                   {speed}

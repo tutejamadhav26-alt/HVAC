@@ -86,48 +86,48 @@ export default function Dashboard() {
       </div>
 
       {/* Quick Fault Simulation Action Controls */}
-      <div className="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-2 text-slate-300 text-sm font-semibold">
-          <PlayCircle className="w-5 h-5 text-blue-400" />
+      <div className="bg-slate-800/80 border border-slate-700/60 rounded-xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-md">
+        <div className="flex items-center gap-2 text-slate-800 dark:text-slate-200 text-sm font-bold">
+          <PlayCircle className="w-5 h-5 text-blue-500" />
           <span>Interactive Simulation Scenario:</span>
         </div>
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => triggerScenario('NORMAL')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition border ${
               simulation.scenario === 'NORMAL'
-                ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30'
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                ? 'bg-emerald-600 !text-white border-emerald-500 shadow-md'
+                : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border-zinc-300 dark:bg-zinc-850 dark:hover:bg-zinc-700 dark:text-zinc-200 dark:border-zinc-700'
             }`}
           >
             NORMAL
           </button>
           <button
             onClick={() => triggerScenario('FILTER_CLOGGING')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition border ${
               simulation.scenario === 'FILTER_CLOGGING'
-                ? 'bg-amber-600 text-white shadow-lg shadow-amber-600/30'
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                ? 'bg-amber-600 !text-white border-amber-500 shadow-md'
+                : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border-zinc-300 dark:bg-zinc-850 dark:hover:bg-zinc-700 dark:text-zinc-200 dark:border-zinc-700'
             }`}
           >
             FILTER CLOGGING
           </button>
           <button
             onClick={() => triggerScenario('COMPRESSOR_OVERLOAD')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition border ${
               simulation.scenario === 'COMPRESSOR_OVERLOAD'
-                ? 'bg-red-600 text-white shadow-lg shadow-red-600/30'
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                ? 'bg-red-600 !text-white border-red-500 shadow-md'
+                : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border-zinc-300 dark:bg-zinc-850 dark:hover:bg-zinc-700 dark:text-zinc-200 dark:border-zinc-700'
             }`}
           >
             COMPRESSOR OVERLOAD
           </button>
           <button
             onClick={() => triggerScenario('REFRIGERANT_LEAKAGE')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition border ${
               simulation.scenario === 'REFRIGERANT_LEAKAGE'
-                ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30'
-                : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                ? 'bg-purple-600 !text-white border-purple-500 shadow-md'
+                : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border-zinc-300 dark:bg-zinc-850 dark:hover:bg-zinc-700 dark:text-zinc-200 dark:border-zinc-700'
             }`}
           >
             REFRIGERANT LEAKAGE

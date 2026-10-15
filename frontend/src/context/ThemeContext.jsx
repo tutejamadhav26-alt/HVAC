@@ -14,13 +14,13 @@ export function ThemeProvider({ children }) {
     if (theme === 'light') {
       root.classList.remove('dark');
       root.classList.add('light');
-      document.body.style.backgroundColor = '#f8fafc';
-      document.body.style.color = '#0f172a';
+      document.body.style.backgroundColor = '#f4f4f6';
+      document.body.style.color = '#09090b';
     } else {
       root.classList.remove('light');
       root.classList.add('dark');
-      document.body.style.backgroundColor = '#0f172a';
-      document.body.style.color = '#f8fafc';
+      document.body.style.backgroundColor = '#0a0a0a';
+      document.body.style.color = '#f4f4f5';
     }
     localStorage.setItem('hvac_theme', theme);
   }, [theme]);
