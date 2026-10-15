@@ -248,10 +248,10 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
                   <button
                     key={mode.id}
                     onClick={() => setSelectedMode(mode.id)}
-                    className={`py-2 px-2.5 rounded-xl text-xs font-bold border transition text-center relative ${
+                    className={`py-2 px-2.5 rounded-xl text-xs font-bold transition text-center relative ${
                       isSelected
-                        ? `${mode.color} border-current ring-2 ring-blue-500/30`
-                        : 'bg-zinc-100 dark:bg-zinc-850 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-300 border-zinc-300 dark:border-zinc-700'
+                        ? `${mode.color} ring-2 ring-blue-500/40`
+                        : 'hvac-btn-inactive'
                     }`}
                   >
                     {mode.label}
@@ -277,10 +277,10 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
                 <button
                   key={speed}
                   onClick={() => setFanSpeed(speed)}
-                  className={`flex-1 py-1.5 rounded-lg text-xs font-bold border transition ${
+                  className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition ${
                     fanSpeed === speed
-                      ? 'bg-blue-600 !text-white border-blue-500 shadow-sm'
-                      : 'bg-zinc-100 dark:bg-zinc-850 hover:bg-zinc-200 dark:hover:bg-zinc-800 text-zinc-800 dark:text-zinc-300 border-zinc-300 dark:border-zinc-700'
+                      ? 'hvac-btn-active-blue shadow-sm'
+                      : 'hvac-btn-inactive'
                   }`}
                 >
                   {speed}

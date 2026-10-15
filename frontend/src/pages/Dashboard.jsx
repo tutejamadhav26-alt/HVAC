@@ -94,40 +94,40 @@ export default function Dashboard() {
         <div className="flex flex-wrap gap-2">
           <button
             onClick={() => triggerScenario('NORMAL')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition border ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition shadow-sm ${
               simulation.scenario === 'NORMAL'
-                ? 'bg-emerald-600 !text-white border-emerald-500 shadow-md'
-                : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border-zinc-300 dark:bg-zinc-850 dark:hover:bg-zinc-700 dark:text-zinc-200 dark:border-zinc-700'
+                ? 'hvac-btn-active-normal shadow-md'
+                : 'hvac-btn-inactive'
             }`}
           >
             NORMAL
           </button>
           <button
             onClick={() => triggerScenario('FILTER_CLOGGING')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition border ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition shadow-sm ${
               simulation.scenario === 'FILTER_CLOGGING'
-                ? 'bg-amber-600 !text-white border-amber-500 shadow-md'
-                : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border-zinc-300 dark:bg-zinc-850 dark:hover:bg-zinc-700 dark:text-zinc-200 dark:border-zinc-700'
+                ? 'hvac-btn-active-filter shadow-md'
+                : 'hvac-btn-inactive'
             }`}
           >
             FILTER CLOGGING
           </button>
           <button
             onClick={() => triggerScenario('COMPRESSOR_OVERLOAD')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition border ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition shadow-sm ${
               simulation.scenario === 'COMPRESSOR_OVERLOAD'
-                ? 'bg-red-600 !text-white border-red-500 shadow-md'
-                : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border-zinc-300 dark:bg-zinc-850 dark:hover:bg-zinc-700 dark:text-zinc-200 dark:border-zinc-700'
+                ? 'hvac-btn-active-overload shadow-md'
+                : 'hvac-btn-inactive'
             }`}
           >
             COMPRESSOR OVERLOAD
           </button>
           <button
             onClick={() => triggerScenario('REFRIGERANT_LEAKAGE')}
-            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition border ${
+            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition shadow-sm ${
               simulation.scenario === 'REFRIGERANT_LEAKAGE'
-                ? 'bg-purple-600 !text-white border-purple-500 shadow-md'
-                : 'bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border-zinc-300 dark:bg-zinc-850 dark:hover:bg-zinc-700 dark:text-zinc-200 dark:border-zinc-700'
+                ? 'hvac-btn-active-leakage shadow-md'
+                : 'hvac-btn-inactive'
             }`}
           >
             REFRIGERANT LEAKAGE

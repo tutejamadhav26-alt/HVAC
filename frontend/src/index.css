@@ -233,3 +233,61 @@ html:not(.dark) ::-webkit-scrollbar-thumb {
 html:not(.dark) ::-webkit-scrollbar-thumb:hover {
   background: #a1a1aa;
 }
+
+/* High-Contrast Control Buttons for Both Dark & Light Themes */
+.hvac-btn-inactive {
+  background-color: #f1f3f5 !important;
+  color: #18181b !important;
+  border: 1px solid #d1d5db !important;
+  font-weight: 700 !important;
+}
+.hvac-btn-inactive:hover {
+  background-color: #e5e7eb !important;
+  color: #000000 !important;
+  border-color: #9ca3af !important;
+}
+
+html.dark .hvac-btn-inactive {
+  background-color: #1c1c1c !important;
+  color: #f4f4f5 !important;
+  border: 1px solid #333333 !important;
+  font-weight: 700 !important;
+}
+html.dark .hvac-btn-inactive:hover {
+  background-color: #262626 !important;
+  color: #ffffff !important;
+  border-color: #4a4a4a !important;
+}
+
+/* Active buttons with pure white text in all themes */
+.hvac-btn-active-normal {
+  background-color: #059669 !important;
+  color: #ffffff !important;
+  border: 1px solid #10b981 !important;
+  font-weight: 700 !important;
+}
+.hvac-btn-active-filter {
+  background-color: #d97706 !important;
+  color: #ffffff !important;
+  border: 1px solid #f59e0b !important;
+  font-weight: 700 !important;
+}
+.hvac-btn-active-overload {
+  background-color: #dc2626 !important;
+  color: #ffffff !important;
+  border: 1px solid #ef4444 !important;
+  font-weight: 700 !important;
+}
+.hvac-btn-active-leakage {
+  background-color: #7c3aed !important;
+  color: #ffffff !important;
+  border: 1px solid #8b5cf6 !important;
+  font-weight: 700 !important;
+}
+.hvac-btn-active-blue {
+  background-color: #2563eb !important;
+  color: #ffffff !important;
+  border: 1px solid #3b82f6 !important;
+  font-weight: 700 !important;
+}
+
