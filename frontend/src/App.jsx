@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { DataProvider } from './context/DataContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Navbar from './components/Navbar';
+import { ScrollProgressBar } from './components/ScrollReveal';
 
 import Dashboard from './pages/Dashboard';
 import LiveMonitoring from './pages/LiveMonitoring';
@@ -20,9 +21,10 @@ export default function App() {
     <ThemeProvider>
       <BrowserRouter>
         <DataProvider>
-          <div className="flex min-h-screen bg-slate-900 text-slate-100 transition-colors duration-200">
+          <div className="min-h-screen transition-colors duration-200 selection:bg-blue-500 selection:text-white">
+            <ScrollProgressBar />
             <Navbar />
-            <main className="flex-1 overflow-y-auto min-h-screen">
+            <main className="pt-20 sm:pt-24 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/live" element={<LiveMonitoring />} />
