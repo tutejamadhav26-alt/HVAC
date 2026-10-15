@@ -26,9 +26,12 @@ export default function Dashboard() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold text-slate-100">AI-Based Smart HVAC System</h1>
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
-              Commercial BEMS Enterprise v2.4
+            <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-2">
+              <span className="font-extrabold tracking-wide text-white">AIRCONIQ</span>
+              <span className="text-cyan-400 font-normal">| Intelligent HVAC System</span>
+            </h1>
+            <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+              PREDICT • PREVENT • PERFORM
             </span>
           </div>
           <p className="text-sm text-slate-400 mt-0.5">

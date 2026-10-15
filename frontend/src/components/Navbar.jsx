@@ -45,13 +45,22 @@ export default function Navbar() {
   return (
     <div className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col h-screen sticky top-0">
       {/* Header Logo */}
-      <div className="p-5 border-b border-slate-800 flex items-center gap-3">
-        <div className="p-2 bg-blue-600/20 text-blue-400 rounded-xl border border-blue-500/30">
-          <Flame className="w-6 h-6 animate-pulse" />
-        </div>
-        <div>
-          <h1 className="font-bold text-base text-slate-100 leading-tight">Smart HVAC AI</h1>
-          <p className="text-xs text-slate-400">Predictive Diagnostics</p>
+      <div className="p-4 border-b border-slate-800/80 flex items-center gap-3">
+        <img 
+          src="/logo-icon.png" 
+          alt="AirconIQ Logo" 
+          className="w-11 h-11 object-contain rounded-xl p-1 bg-black border border-slate-700/60 shadow-md flex-shrink-0" 
+        />
+        <div className="min-w-0">
+          <div className="flex items-center gap-1.5">
+            <span className="font-black text-base tracking-wider text-slate-100 dark:text-white leading-tight">
+              AIRCONIQ
+            </span>
+            <span className="text-[9px] px-1.5 py-0.2 rounded font-bold bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">AI</span>
+          </div>
+          <span className="text-[8.5px] font-bold tracking-widest text-amber-400 block truncate mt-0.5">
+            PREDICT • PREVENT • PERFORM
+          </span>
         </div>
       </div>
 
@@ -117,8 +126,8 @@ export default function Navbar() {
       </div>
 
       {/* Footer */}
-      <div className="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
-        HVAC Minor Project v1.0.0
+      <div className="p-4 border-t border-slate-800 text-xs text-slate-500 text-center font-medium">
+        AirconIQ Operations v1.0.0
       </div>
     </div>
   );
