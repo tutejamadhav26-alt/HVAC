@@ -5,6 +5,7 @@ import HealthGauge from '../components/HealthGauge';
 import UniversalRemoteWidget from '../components/UniversalRemoteWidget';
 import TechnicianView from '../components/TechnicianView';
 import CommercialROIWidget from '../components/CommercialROIWidget';
+import { motion } from 'framer-motion';
 import { ScrollReveal, StaggerContainer, StaggerItem } from '../components/ScrollReveal';
 import { 
   Thermometer, Droplets, Gauge, Zap, Activity, AlertTriangle, 
@@ -23,46 +24,44 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Header Bar */}
+      {/* Centered Facility vs Technician Mode Switcher */}
       <ScrollReveal>
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 flex items-center gap-2">
-                <span className="font-extrabold text-black dark:text-white">AIRCONIQ</span>
-                <span className="text-blue-600 dark:text-cyan-400 font-normal">| Diagnostic Platform</span>
-              </h1>
-              <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                PREDICT • PREVENT • PERFORM
-              </span>
-            </div>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">
-              Real-time telemetry, multi-zone occupancy load compensation, universal remote dispatch & predictive diagnostics
-            </p>
-          </div>
-
-          {/* View Mode Switcher */}
-          <div className="flex items-center bg-zinc-100 dark:bg-[#161616] p-1 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm">
+        <div className="flex justify-center items-center pt-1 pb-2">
+          <div className="relative inline-flex items-center bg-zinc-100 dark:bg-[#141414] p-1 rounded-2xl border border-zinc-200/90 dark:border-zinc-800/90 shadow-sm">
             <button
               onClick={() => setActiveTab('facility')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+              className={`relative z-10 flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-colors ${
                 activeTab === 'facility'
-                  ? 'bg-white dark:bg-zinc-800 text-blue-600 dark:text-blue-400 shadow-sm'
-                  : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                  ? 'text-blue-600 dark:text-blue-400'
+                  : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
               }`}
             >
-              <Building2 className="w-3.5 h-3.5" />
-              <span>Facility & Remote</span>
+              {activeTab === 'facility' && (
+                <motion.div
+                  layoutId="tab-switch-pill"
+                  className="absolute inset-0 bg-white dark:bg-zinc-800 rounded-xl shadow-sm -z-10"
+                  transition={{ type: 'spring', stiffness: 450, damping: 35 }}
+                />
+              )}
+              <Building2 className="w-4 h-4" />
+              <span>Facility & Remote Dispatch</span>
             </button>
             <button
               onClick={() => setActiveTab('technician')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+              className={`relative z-10 flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-colors ${
                 activeTab === 'technician'
-                  ? 'bg-white dark:bg-zinc-800 text-amber-600 dark:text-amber-400 shadow-sm'
-                  : 'text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200'
+                  ? 'text-amber-600 dark:text-amber-400'
+                  : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
               }`}
             >
-              <Wrench className="w-3.5 h-3.5" />
+              {activeTab === 'technician' && (
+                <motion.div
+                  layoutId="tab-switch-pill"
+                  className="absolute inset-0 bg-white dark:bg-zinc-800 rounded-xl shadow-sm -z-10"
+                  transition={{ type: 'spring', stiffness: 450, damping: 35 }}
+                />
+              )}
+              <Wrench className="w-4 h-4" />
               <span>Technician Diagnostics</span>
             </button>
           </div>
