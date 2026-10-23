@@ -8,7 +8,7 @@ from ml_engine import ml_engine
 from simulator import simulator
 from mqtt_client import mqtt_manager
 
-from routers import auth, hvac, sensors, predictions, alerts, energy, simulation, websocket, system, commercial
+from routers import auth, hvac, sensors, predictions, alerts, energy, simulation, websocket, system, commercial, audit
 
 app = FastAPI(
     title="Smart HVAC Monitoring & Prediction System API",
@@ -38,6 +38,8 @@ app.include_router(simulation.router)
 app.include_router(websocket.router)
 app.include_router(system.router)
 app.include_router(commercial.router)
+app.include_router(audit.router)
+
 
 def seed_initial_data():
     db = SessionLocal()

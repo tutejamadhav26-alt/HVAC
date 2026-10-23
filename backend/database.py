@@ -36,7 +36,15 @@ def init_db():
                 "zone_type": "VARCHAR(50) DEFAULT 'Commercial Office'",
                 "brand": "VARCHAR(50) DEFAULT 'Daikin'",
                 "current_setpoint": "FLOAT DEFAULT 24.0",
-                "current_mode": "VARCHAR(20) DEFAULT 'AUTO'"
+                "current_mode": "VARCHAR(20) DEFAULT 'AUTO'",
+                "fan_speed": "VARCHAR(20) DEFAULT 'AUTO'",
+                "power_state": "BOOLEAN DEFAULT 1",
+                "controller_type": "VARCHAR(50) DEFAULT 'simulator'",
+                "connection_params": "TEXT DEFAULT '{}'",
+                "connection_status": "VARCHAR(50) DEFAULT 'SIMULATED'",
+                "auto_mode_enabled": "BOOLEAN DEFAULT 0",
+                "last_command_result": "TEXT",
+                "last_command_at": "DATETIME"
             }
             for col, col_type in new_hvac_cols.items():
                 if existing_cols and col not in existing_cols:

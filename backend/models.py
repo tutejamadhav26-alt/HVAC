@@ -29,12 +29,21 @@ class HVACUnit(Base):
     brand = Column(String, default="Daikin")  # Daikin, Carrier, Panasonic, Toshiba, Mitsubishi, LG, Voltas
     current_setpoint = Column(Float, default=24.0)
     current_mode = Column(String, default="AUTO")
+    fan_speed = Column(String, default="AUTO")
+    power_state = Column(Boolean, default=True)
     status = Column(String, default="NORMAL")  # NORMAL, WARNING, CRITICAL, OFFLINE
+    controller_type = Column(String, default="simulator")  # central_ducted, vrf_vrv, simulator, mqtt_esp32
+    connection_params = Column(Text, default="{}")  # JSON encoded config
+    connection_status = Column(String, default="SIMULATED")  # SIMULATED, CONNECTED, DISCONNECTED, UNCONFIGURED
+    auto_mode_enabled = Column(Boolean, default=False)
+    last_command_result = Column(Text, nullable=True)
+    last_command_at = Column(DateTime, nullable=True)
     installation_date = Column(DateTime, default=utc_now)
 
     readings = relationship("SensorReading", back_populates="unit")
     predictions = relationship("Prediction", back_populates="unit")
     alerts = relationship("Alert", back_populates="unit")
+    command_logs = relationship("HVACCommandLog", back_populates="unit")
 
 class SensorReading(Base):
     __tablename__ = "sensor_readings"
@@ -124,3 +133,50 @@ class EnergyRecord(Base):
     peak_power_w = Column(Float, default=0.0)
     avg_power_w = Column(Float, default=0.0)
     timestamp = Column(DateTime, default=utc_now)
+
+class AuditRecord(Base):
+    __tablename__ = "audit_records"
+
+    id = Column(Integer, primary_key=True, index=True)
+    audit_id = Column(String, unique=True, index=True, nullable=False)
+    facility_name = Column(String, default="Airconiq Cyber Park - Commercial Facility")
+    unit_id = Column(String, nullable=False)
+    auditor_email = Column(String, nullable=False)
+    auditor_name = Column(String, default="ESG Energy Auditor")
+    audit_type = Column(String, default="ASHRAE Level 2 Detailed Energy & Health Audit")
+    score = Column(Float, nullable=False) # 0-100
+    letter_grade = Column(String, nullable=False) # A+, A, B, C, D, F
+    cop_measured = Column(Float, default=3.4)
+    eer_measured = Column(Float, default=11.6)
+    ashrae_compliance = Column(String, default="COMPLIANT")
+    annual_kwh_baseline = Column(Float, default=24000.0)
+    annual_kwh_optimized = Column(Float, default=18720.0)
+    annual_kwh_wasted = Column(Float, default=5280.0)
+    annual_cost_savings = Column(Float, default=44880.0)
+    currency = Column(String, default="INR")
+    currency_symbol = Column(String, default="₹")
+    carbon_emissions_mt = Column(Float, default=19.68)
+    carbon_abatement_mt = Column(Float, default=4.33)
+    trees_offset_equivalent = Column(Integer, default=198)
+    summary = Column(Text, nullable=False)
+    detailed_metrics = Column(Text, nullable=True) # JSON serialized details
+    created_at = Column(DateTime, default=utc_now, index=True)
+
+
+class HVACCommandLog(Base):
+    __tablename__ = "hvac_command_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    unit_id = Column(String, ForeignKey("hvac_units.unit_id"), index=True, nullable=False)
+    triggered_by = Column(String, default="manual")  # 'manual', 'ai_auto', 'schedule'
+    user_email = Column(String, nullable=True)
+    target_temperature = Column(Float, nullable=True)
+    mode = Column(String, nullable=True)
+    fan_speed = Column(String, nullable=True)
+    power_state = Column(Boolean, nullable=True)
+    success = Column(Boolean, default=True)
+    message = Column(Text, nullable=True)
+    timestamp = Column(DateTime, default=utc_now, index=True)
+
+    unit = relationship("HVACUnit", back_populates="command_logs")
+

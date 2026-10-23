@@ -7,10 +7,10 @@ const BRANDS = [
 ];
 
 const MODES = [
-  { id: 'COOL', label: 'Cool', color: 'bg-blue-600 !text-white border-blue-500 shadow-md font-bold' },
-  { id: 'AUTO', label: 'Auto AI', color: 'bg-emerald-600 !text-white border-emerald-500 shadow-md font-bold' },
-  { id: 'DRY', label: 'Dry (Dehum)', color: 'bg-teal-600 !text-white border-teal-500 shadow-md font-bold' },
-  { id: 'FAN', label: 'Fan Only', color: 'bg-indigo-600 !text-white border-indigo-500 shadow-md font-bold' },
+  { id: 'COOL', label: 'Cool', color: 'bg-emerald-600 !text-white border-emerald-500 shadow-md font-bold' },
+  { id: 'AUTO', label: 'Auto AI', color: 'bg-teal-600 !text-white border-teal-500 shadow-md font-bold' },
+  { id: 'DRY', label: 'Dry (Dehum)', color: 'bg-emerald-700 !text-white border-emerald-600 shadow-md font-bold' },
+  { id: 'FAN', label: 'Fan Only', color: 'bg-violet-600 !text-white border-violet-500 shadow-md font-bold' },
   { id: 'TURBO', label: 'Turbo Max', color: 'bg-red-600 !text-white border-red-500 shadow-md font-bold' },
   { id: 'ECO', label: 'Eco Saver', color: 'bg-green-600 !text-white border-green-500 shadow-md font-bold' }
 ];
@@ -92,7 +92,7 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
       <div className="flex flex-wrap items-center justify-between gap-4 mb-5 border-b border-zinc-200 dark:border-zinc-800 pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-blue-500/10 text-blue-600 dark:bg-cyan-500/20 dark:text-cyan-400">
+            <span className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
@@ -112,7 +112,7 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
           <select
             value={selectedBrand}
             onChange={(e) => setSelectedBrand(e.target.value)}
-            className="bg-zinc-100 dark:bg-[#1a1a1a] text-zinc-900 dark:text-cyan-300 text-xs font-bold px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 focus:outline-none focus:ring-1 focus:ring-blue-500 transition"
+            className="bg-zinc-100 dark:bg-[#1a1a1a] text-zinc-900 dark:text-emerald-300 text-xs font-bold px-3 py-1.5 rounded-lg border border-zinc-300 dark:border-zinc-700 focus:outline-none focus:ring-1 focus:ring-emerald-500 transition"
           >
             {BRANDS.map(brand => (
               <option key={brand} value={brand}>{brand}</option>
@@ -143,7 +143,7 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
         <div className="bg-zinc-50 dark:bg-[#161616] border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl p-3 flex items-center justify-between">
           <div>
             <div className="text-[11px] uppercase tracking-wider text-zinc-500 dark:text-zinc-400 font-bold">Indoor / Outdoor Temp</div>
-            <div className="text-xl font-bold text-blue-600 dark:text-cyan-400 flex items-baseline gap-1 mt-0.5">
+            <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400 flex items-baseline gap-1 mt-0.5">
               {indoorTemp.toFixed(1)}°C <span className="text-xs font-normal text-zinc-500 dark:text-zinc-400">/ {outdoorTemp.toFixed(1)}°C</span>
             </div>
           </div>
@@ -178,7 +178,7 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
             <div className="text-center">
               <div className="text-5xl font-extrabold text-zinc-900 dark:text-white font-mono tracking-tight">
                 {safeTargetTemp.toFixed(1)}
-                <span className="text-2xl text-blue-600 dark:text-cyan-400 font-normal ml-0.5">°C</span>
+                <span className="text-2xl text-emerald-600 dark:text-emerald-400 font-normal ml-0.5">°C</span>
               </div>
               <div className="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1">
                 AI Suggestion: <strong className="text-emerald-600 dark:text-emerald-400">{Number(recommendation?.target_temperature ?? recommendation?.recommended_temperature ?? 24.0).toFixed(1)}°C</strong>
@@ -198,7 +198,7 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
             {safeTargetTemp > indoorTemp ? (
               <span className="text-amber-600 dark:text-amber-400 font-bold">▲ Increase Setpoint (Conserve Energy)</span>
             ) : safeTargetTemp < indoorTemp ? (
-              <span className="text-blue-600 dark:text-cyan-400 font-bold">▼ Decrease Setpoint (Active Cooling)</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-bold">▼ Decrease Setpoint (Active Cooling)</span>
             ) : (
               <span className="text-emerald-600 dark:text-emerald-400 font-bold">✔ Equilibrium Reached</span>
             )}
@@ -230,7 +230,7 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
                     onClick={() => setSelectedMode(mode.id)}
                     className={`py-2 px-2.5 rounded-xl text-xs font-bold transition text-center relative ${
                       isSelected
-                        ? `${mode.color} ring-2 ring-blue-500/40`
+                        ? `${mode.color} ring-2 ring-emerald-500/40`
                         : 'hvac-btn-inactive'
                     }`}
                   >
@@ -259,7 +259,7 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
                   onClick={() => setFanSpeed(speed)}
                   className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition ${
                     fanSpeed === speed
-                      ? 'hvac-btn-active-blue shadow-sm'
+                      ? 'hvac-btn-active-normal shadow-sm'
                       : 'hvac-btn-inactive'
                   }`}
                 >
@@ -274,14 +274,14 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
 
       {/* AI Thermodynamic Explanation & Reasoning - High Contrast Synchronized Theme */}
       {rationaleText && (
-        <div className="mt-4 bg-blue-50 dark:bg-[#181818] border border-blue-200/90 dark:border-zinc-800 rounded-xl p-3.5 flex items-start gap-3 shadow-xs transition-colors">
-          <span className="p-1.5 rounded-lg bg-blue-500/10 text-blue-600 dark:bg-cyan-500/20 dark:text-cyan-400 mt-0.5 shrink-0">
+        <div className="mt-4 bg-emerald-50 dark:bg-[#181818] border border-emerald-200/90 dark:border-zinc-800 rounded-xl p-3.5 flex items-start gap-3 shadow-xs transition-colors">
+          <span className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400 mt-0.5 shrink-0">
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </span>
           <div className="text-xs">
-            <strong className="text-blue-900 dark:text-cyan-300 block mb-1 font-bold">
+            <strong className="text-emerald-900 dark:text-emerald-300 block mb-1 font-bold">
               AI Thermodynamic Optimization Rationale:
             </strong>
             <p className="text-zinc-800 dark:text-zinc-200 leading-relaxed font-medium">
@@ -307,7 +307,7 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
       <div className="mt-5 flex items-center justify-between pt-3 border-t border-zinc-200 dark:border-zinc-800">
         <button
           onClick={loadRecommendation}
-          className="text-xs font-semibold text-zinc-500 hover:text-blue-600 dark:text-zinc-400 dark:hover:text-cyan-400 flex items-center gap-1.5 transition"
+          className="text-xs font-semibold text-zinc-500 hover:text-emerald-600 dark:text-zinc-400 dark:hover:text-emerald-400 flex items-center gap-1.5 transition"
         >
           <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -318,7 +318,7 @@ export default function UniversalRemoteWidget({ unitId = 'HVAC-001', sensorData,
         <button
           onClick={handleApply}
           disabled={isApplying}
-          className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs tracking-wider uppercase shadow-md active:scale-95 transition disabled:opacity-50 flex items-center gap-2"
+          className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs tracking-wider uppercase shadow-md active:scale-95 transition disabled:opacity-50 flex items-center gap-2"
         >
           {isApplying ? (
             <>

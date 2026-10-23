@@ -40,10 +40,28 @@ class HVACUnitBase(BaseModel):
     brand: Optional[str] = "Daikin"
     current_setpoint: Optional[float] = 24.0
     current_mode: Optional[str] = "AUTO"
+    fan_speed: Optional[str] = "AUTO"
+    power_state: Optional[bool] = True
     status: str = "NORMAL"
+    controller_type: Optional[str] = "simulator"  # central_ducted, vrf_vrv, simulator, mqtt_esp32
+    connection_params: Optional[str] = "{}"
+    connection_status: Optional[str] = "SIMULATED"
+    auto_mode_enabled: Optional[bool] = False
+    last_command_result: Optional[str] = None
+    last_command_at: Optional[datetime] = None
 
 class HVACUnitCreate(HVACUnitBase):
     pass
+
+class HVACUnitUpdate(BaseModel):
+    name: Optional[str] = None
+    location: Optional[str] = None
+    building_floor: Optional[str] = None
+    zone_type: Optional[str] = None
+    brand: Optional[str] = None
+    controller_type: Optional[str] = None
+    connection_params: Optional[str] = None
+    auto_mode_enabled: Optional[bool] = None
 
 class HVACUnitResponse(HVACUnitBase):
     id: int
@@ -209,3 +227,100 @@ class ROIAnalyticsResponse(BaseModel):
     roi_payback_months: float
     occupancy_driven_savings_pct: float
     building_zones_optimized: int
+
+# Comprehensive HVAC & ESG Audit Schemas
+class AuditCreateRequest(BaseModel):
+    unit_id: Optional[str] = "HVAC-001"
+    facility_name: Optional[str] = "Airconiq Cyber Park - HQ Facility"
+    auditor_email: Optional[str] = "auditor@airconiq.ai"
+    auditor_name: Optional[str] = "ESG Energy Auditor"
+    audit_type: Optional[str] = "ASHRAE Level 2 Detailed Thermodynamic & ESG Audit"
+    electricity_tariff: Optional[float] = 8.50
+    currency: Optional[str] = "INR"
+
+class AuditRecommendationItem(BaseModel):
+    priority: str       # Immediate, High, Medium, Low
+    category: str       # Mechanical, Thermodynamic, Controls, Maintenance
+    title: str
+    description: str
+    estimated_capex: float
+    annual_savings: float
+    payback_months: float
+
+class AuditResponse(BaseModel):
+    id: int
+    audit_id: str
+    facility_name: str
+    unit_id: str
+    auditor_email: str
+    auditor_name: str
+    audit_type: str
+    score: float
+    letter_grade: str
+    cop_measured: float
+    eer_measured: float
+    ashrae_compliance: str
+    annual_kwh_baseline: float
+    annual_kwh_optimized: float
+    annual_kwh_wasted: float
+    annual_cost_savings: float
+    currency: str
+    currency_symbol: str
+    carbon_emissions_mt: float
+    carbon_abatement_mt: float
+    trees_offset_equivalent: int
+    summary: str
+    detailed_metrics: Optional[dict] = None
+    recommendations: Optional[List[dict]] = None
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# Remote Control, Controller Adapter, and Unified AI Recommendation Schemas
+class HVACRemoteCommandRequest(BaseModel):
+    unit_id: str
+    power_state: Optional[bool] = None
+    target_temperature: Optional[float] = None
+    mode: Optional[str] = None
+    fan_speed: Optional[str] = None
+    triggered_by: Optional[str] = "manual"  # 'manual', 'ai_auto'
+
+
+class HVACRemoteCommandResponse(BaseModel):
+    success: bool
+    unit_id: str
+    message: str
+    applied_state: dict
+    timestamp: str
+
+
+class DeviceCapabilitiesResponse(BaseModel):
+    unit_id: str
+    controller_type: str
+    supported_modes: List[str]
+    min_temperature: float
+    max_temperature: float
+    temperature_step: float
+    supported_fan_speeds: List[str]
+    supports_power_toggle: bool
+    supports_auto_mode: bool
+    protocol_name: str
+
+
+class ConnectionTestResult(BaseModel):
+    connected: bool
+    status: str
+    message: str
+
+
+class UnifiedAIRecommendation(BaseModel):
+    unit_id: str
+    current_conditions: dict
+    ml_model_diagnosis: dict
+    setpoint_recommendation: dict
+    strategy_distinction: dict
+    auto_mode_status: dict
+    timestamp: str
+

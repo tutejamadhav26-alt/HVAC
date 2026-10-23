@@ -16,7 +16,7 @@ export default function LiveMonitoring() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-        <MetricCard title="Temp" value={latestReading.temperature} unit="°C" icon={Thermometer} color="blue" />
+        <MetricCard title="Temp" value={latestReading.temperature} unit="°C" icon={Thermometer} color="emerald" />
         <MetricCard title="Humidity" value={latestReading.humidity} unit="%" icon={Droplets} color="green" />
         <MetricCard title="Pressure" value={latestReading.pressure} unit="kPa" icon={Gauge} color="purple" />
         <MetricCard title="Current" value={latestReading.current} unit="A" icon={Activity} color="yellow" />
@@ -33,9 +33,9 @@ export default function LiveMonitoring() {
               <LineChart data={history}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                 <XAxis dataKey="timestamp" tickFormatter={(t) => t ? t.substring(11, 19) : ''} stroke="#64748b" fontSize={11} />
-                <YAxis stroke="#3b82f6" fontSize={11} domain={['auto', 'auto']} />
+                <YAxis stroke="#10b981" fontSize={11} domain={['auto', 'auto']} />
                 <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155' }} />
-                <Line type="monotone" dataKey="temperature" stroke="#3b82f6" strokeWidth={2} dot={false} isAnimationActive={false} />
+                <Line type="monotone" dataKey="temperature" stroke="#10b981" strokeWidth={2} dot={false} isAnimationActive={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>

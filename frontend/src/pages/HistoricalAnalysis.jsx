@@ -37,7 +37,7 @@ export default function HistoricalAnalysis() {
               onClick={() => setTimeframe(tf)}
               className={`px-3.5 py-1.5 rounded-md text-xs font-semibold uppercase transition ${
                 timeframe === tf
-                  ? 'bg-blue-600 text-white shadow'
+                  ? 'bg-emerald-600 text-white shadow'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -59,10 +59,10 @@ export default function HistoricalAnalysis() {
                 <LineChart data={historyData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                   <XAxis dataKey="timestamp" tickFormatter={(t) => t ? t.substring(11, 16) : ''} stroke="#64748b" fontSize={11} />
-                  <YAxis yAxisId="temp" stroke="#3b82f6" fontSize={11} domain={['auto', 'auto']} />
+                  <YAxis yAxisId="temp" stroke="#a855f7" fontSize={11} domain={['auto', 'auto']} />
                   <YAxis yAxisId="hum" orientation="right" stroke="#10b981" fontSize={11} domain={['auto', 'auto']} />
                   <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155' }} />
-                  <Line yAxisId="temp" type="monotone" dataKey="temperature" name="Temp (°C)" stroke="#3b82f6" strokeWidth={2} dot={false} />
+                  <Line yAxisId="temp" type="monotone" dataKey="temperature" name="Temp (°C)" stroke="#a855f7" strokeWidth={2} dot={false} />
                   <Line yAxisId="hum" type="monotone" dataKey="humidity" name="Humidity (%)" stroke="#10b981" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>

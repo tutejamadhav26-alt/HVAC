@@ -1,324 +1,698 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Thermometer, 
+  Droplets, 
+  Zap, 
+  Activity, 
+  CheckCircle2, 
+  AlertTriangle, 
+  Cpu, 
+  RefreshCw, 
+  Power,
+  Wind,
+  Gauge,
+  Building2, 
+  Check, 
+  ChevronDown, 
+  Info,
+  Layers,
+  Sliders,
+  TrendingUp,
+  TrendingDown
+} from 'lucide-react';
+import { 
+  ResponsiveContainer, 
+  ComposedChart, 
+  Area, 
+  Line, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  Tooltip, 
+  CartesianGrid, 
+  Legend 
+} from 'recharts';
+
 import { useData } from '../context/DataContext';
 import MetricCard from '../components/MetricCard';
 import HealthGauge from '../components/HealthGauge';
-import UniversalRemoteWidget from '../components/UniversalRemoteWidget';
-import TechnicianView from '../components/TechnicianView';
-import CommercialROIWidget from '../components/CommercialROIWidget';
-import { motion } from 'framer-motion';
-import { ScrollReveal, StaggerContainer, StaggerItem } from '../components/ScrollReveal';
+import ThermostatDial from '../components/ThermostatDial';
 import { 
-  Thermometer, Droplets, Gauge, Zap, Activity, AlertTriangle, 
-  PlayCircle, Users, Sun, Wrench, Building2
-} from 'lucide-react';
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from 'recharts';
-import { useTheme } from '../context/ThemeContext';
+  fetchHVACUnits, 
+  sendHVACCommand, 
+  updateHVACUnit,
+  fetchSensorHistory
+} from '../services/api';
 
 export default function Dashboard() {
-  const { latestReading, latestPrediction, alerts, simulation, telemetryHistory, triggerScenario } = useData();
-  const { theme } = useTheme();
-  const [activeTab, setActiveTab] = useState('facility'); // 'facility' | 'technician'
+  const { latestReading, latestPrediction, alerts } = useData();
 
-  const occupancyCount = latestReading.occupancy ?? 6;
-  const outdoorTemp = latestReading.outdoor_temp ?? 33.5;
+  const [units, setUnits] = useState([]);
+  const [selectedUnitId, setSelectedUnitId] = useState('HVAC-001');
+  const [currentUnit, setCurrentUnit] = useState(null);
+  const [loadingUnits, setLoadingUnits] = useState(true);
+  const [historyData, setHistoryData] = useState([]);
+  const [timeframe, setTimeframe] = useState('1h');
+  const [loadingHistory, setLoadingHistory] = useState(false);
+
+  // Fetch registered HVAC units
+  const loadUnits = async () => {
+    setLoadingUnits(true);
+    try {
+      const data = await fetchHVACUnits();
+      if (data && data.length > 0) {
+        setUnits(data);
+        const active = data.find(u => u.unit_id === selectedUnitId) || data[0];
+        setCurrentUnit(active);
+        setSelectedUnitId(active.unit_id);
+      }
+    } catch (e) {
+      console.error('Failed to load HVAC units:', e);
+    } finally {
+      setLoadingUnits(false);
+    }
+  };
+
+  // Fetch Telemetry History for Chart and Sparklines
+  const loadHistory = async (unitId, tf) => {
+    setLoadingHistory(true);
+    try {
+      const hist = await fetchSensorHistory(unitId, tf);
+      if (Array.isArray(hist) && hist.length > 0) {
+        setHistoryData(hist);
+      }
+    } catch (e) {
+      console.error('Failed to load telemetry history:', e);
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
+  useEffect(() => {
+    loadUnits();
+  }, []);
+
+  useEffect(() => {
+    if (selectedUnitId) {
+      loadHistory(selectedUnitId, timeframe);
+      const interval = setInterval(() => {
+        loadHistory(selectedUnitId, timeframe);
+      }, 8000);
+      return () => clearInterval(interval);
+    }
+  }, [selectedUnitId, timeframe]);
+
+  // Handle unit change
+  const handleSelectUnit = (e) => {
+    const id = e.target.value;
+    setSelectedUnitId(id);
+    const found = units.find(u => u.unit_id === id);
+    if (found) setCurrentUnit(found);
+  };
+
+  // Transmit command to physical/simulated controller
+  const handleApplyThermostatChanges = async ({ target_temperature, mode, fan_speed }) => {
+    if (!currentUnit) return;
+    const res = await sendHVACCommand(currentUnit.unit_id, {
+      power_state: currentUnit.power_state ?? true,
+      target_temperature,
+      mode,
+      fan_speed,
+      triggered_by: 'dashboard_manual'
+    });
+
+    setCurrentUnit(prev => ({
+      ...prev,
+      current_setpoint: target_temperature,
+      current_mode: mode,
+      fan_speed: fan_speed
+    }));
+
+    return res;
+  };
+
+  // Control Mode Toggle: Auto vs Manual
+  const handleToggleAutoMode = async (modeVal) => {
+    if (!currentUnit) return;
+    const isAuto = modeVal === 'auto';
+    if (currentUnit.auto_mode_enabled === isAuto) return;
+
+    try {
+      const updated = await updateHVACUnit(currentUnit.unit_id, {
+        auto_mode_enabled: isAuto
+      });
+      setCurrentUnit(updated);
+    } catch (err) {
+      console.error('Failed to update control mode:', err);
+    }
+  };
+
+  // Power Toggle
+  const handleTogglePower = async () => {
+    if (!currentUnit) return;
+    const nextPower = !currentUnit.power_state;
+    try {
+      await sendHVACCommand(currentUnit.unit_id, {
+        power_state: nextPower,
+        target_temperature: currentUnit.current_setpoint,
+        mode: currentUnit.current_mode,
+        fan_speed: currentUnit.fan_speed,
+        triggered_by: 'power_toggle'
+      });
+      setCurrentUnit(prev => ({ ...prev, power_state: nextPower }));
+    } catch (e) {
+      console.error('Power toggle failed:', e);
+    }
+  };
+
+
+  // Zone breadcrumb deduplication
+  const zoneBreadcrumb = useMemo(() => {
+    if (!currentUnit) return 'Building A · Floor 2 · Conference Zone';
+    const loc = currentUnit.location || '';
+    const floor = currentUnit.building_floor || '';
+    const zone = currentUnit.zone_type || '';
+
+    // Prevent repeated Floor mentions
+    let parts = [loc];
+    if (floor && !loc.toLowerCase().includes(floor.toLowerCase())) {
+      parts.push(floor);
+    }
+    if (zone && !loc.toLowerCase().includes(zone.toLowerCase())) {
+      parts.push(zone);
+    }
+    return parts.join(' · ');
+  }, [currentUnit]);
+
+  // Metric Sparklines and Deltas
+  const tempSparkline = useMemo(() => historyData.map(h => h.temperature), [historyData]);
+  const humSparkline = useMemo(() => historyData.map(h => h.humidity), [historyData]);
+  const powerSparkline = useMemo(() => historyData.map(h => h.power), [historyData]);
+
+  // 1-hour deltas
+  const tempDelta = useMemo(() => {
+    if (historyData.length < 2) return null;
+    const first = historyData[0].temperature;
+    const last = historyData[historyData.length - 1].temperature;
+    const diff = Number((last - first).toFixed(1));
+    return diff > 0 ? `+${diff}°C vs 1h ago` : diff < 0 ? `${diff}°C vs 1h ago` : `0.0°C vs 1h ago`;
+  }, [historyData]);
+
+  const humDelta = useMemo(() => {
+    if (historyData.length < 2) return null;
+    const first = historyData[0].humidity;
+    const last = historyData[historyData.length - 1].humidity;
+    const diff = Number((last - first).toFixed(1));
+    return diff > 0 ? `+${diff}% vs 1h ago` : diff < 0 ? `${diff}% vs 1h ago` : `0.0% vs 1h ago`;
+  }, [historyData]);
+
+  const powerDelta = useMemo(() => {
+    if (historyData.length < 2) return null;
+    const first = historyData[0].power;
+    const last = historyData[historyData.length - 1].power;
+    const diff = Math.round(last - first);
+    return diff > 0 ? `+${diff}W vs 1h ago` : diff < 0 ? `${diff}W vs 1h ago` : `0W vs 1h ago`;
+  }, [historyData]);
+
+  // Chart data formatting
+  const chartPoints = useMemo(() => {
+    if (!historyData || historyData.length === 0) return [];
+    const setpoint = currentUnit?.current_setpoint ?? 24.0;
+    return historyData.map((d) => {
+      const t = new Date(d.timestamp);
+      const timeStr = !isNaN(t.getTime()) 
+        ? t.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        : '';
+      return {
+        time: timeStr,
+        temperature: Number(d.temperature?.toFixed(1) || 24.0),
+        setpoint: setpoint,
+        power: Math.round(d.power || 0)
+      };
+    });
+  }, [historyData, currentUnit]);
+
+  // Numerical values
+  const currentTemp = latestReading?.temperature !== undefined ? Number(latestReading.temperature).toFixed(1) : '23.4';
+  const currentHum = latestReading?.humidity !== undefined ? Number(latestReading.humidity).toFixed(1) : '50.2';
+  const currentPower = latestReading?.power !== undefined ? Math.round(latestReading.power) : 980;
+  const currentSetpoint = currentUnit?.current_setpoint ?? 24.0;
+  const isPowerOn = currentUnit?.power_state ?? true;
+  const isAutoMode = currentUnit?.auto_mode_enabled ?? false;
+  const isDemo = currentUnit?.connection_status === 'SIMULATED' || currentUnit?.controller_type === 'simulator';
+  const humValueNum = parseFloat(currentHum);
+  const isHumidityOutOfRange = humValueNum < 40 || humValueNum > 60;
 
   return (
-    <div className="space-y-6">
-      {/* Centered Facility vs Technician Mode Switcher */}
-      <ScrollReveal>
-        <div className="flex justify-center items-center pt-1 pb-2">
-          <div className="relative inline-flex items-center bg-zinc-100 dark:bg-[#141414] p-1 rounded-2xl border border-zinc-200/90 dark:border-zinc-800/90 shadow-sm">
+    <div className="space-y-6 max-w-7xl mx-auto">
+      {/* 1. STATUS STRIP (Commercial Building Standards) */}
+      <section 
+        aria-label="Controller Status Bar"
+        className="rounded-[14px] border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-[#121821] p-4 sm:p-5 shadow-sm transition-colors"
+      >
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          
+          {/* Unit Selector & Clean Zone Breadcrumb */}
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="p-2.5 rounded-[10px] bg-black/[0.04] dark:bg-white/[0.05] border border-black/[0.08] dark:border-white/[0.08] text-[#3b82f6]">
+              <Building2 className="w-5 h-5" />
+            </div>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <label htmlFor="hvac-unit-select" className="text-xs font-bold text-zinc-500 dark:text-[#9aa7b4] uppercase tracking-wider">
+                  Unit:
+                </label>
+                <div className="relative inline-flex items-center">
+                  <select
+                    id="hvac-unit-select"
+                    value={selectedUnitId}
+                    onChange={handleSelectUnit}
+                    aria-label="Select HVAC Unit"
+                    className="bg-black/[0.03] dark:bg-white/[0.05] border border-black/[0.1] dark:border-white/[0.1] text-xs font-bold rounded-[8px] pl-2.5 pr-8 py-1.5 text-zinc-900 dark:text-[#e6edf3] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#3b82f6] cursor-pointer appearance-none"
+                  >
+                    {units.map(u => (
+                      <option key={u.unit_id} value={u.unit_id} className="dark:bg-[#121821]">
+                        {u.name} ({u.unit_id})
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="w-3.5 h-3.5 text-zinc-500 pointer-events-none absolute right-2.5" />
+                </div>
+
+                {/* Demo Data Amber Badge vs Live Green Badge */}
+                {isDemo ? (
+                  <span className="px-2.5 py-0.5 rounded-[6px] text-xs font-bold uppercase tracking-wider bg-[#f59e0b]/10 text-[#f59e0b] border border-[#f59e0b]/30">
+                    Demo data
+                  </span>
+                ) : (
+                  <span className="px-2.5 py-0.5 rounded-[6px] text-xs font-bold uppercase tracking-wider bg-[#22c55e]/10 text-[#22c55e] border border-[#22c55e]/30 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e] animate-pulse" />
+                    Live
+                  </span>
+                )}
+              </div>
+
+              {/* Clean Zone Text without repetitive Floor 2 */}
+              <p className="text-xs text-zinc-600 dark:text-[#9aa7b4] mt-1">
+                Zone: <span className="font-semibold text-zinc-900 dark:text-[#e6edf3]">{zoneBreadcrumb}</span>
+              </p>
+            </div>
+          </div>
+
+          {/* Right Controls: Segmented Auto/Manual Toggle, Power Switch, Staleness */}
+          <div className="flex flex-wrap items-center gap-3">
+            
+            {/* Control-Mode Segmented Toggle (Auto / Manual) */}
+            <div 
+              role="radiogroup" 
+              aria-label="Control Mode"
+              className="inline-flex rounded-[10px] bg-black/[0.04] dark:bg-white/[0.05] p-1 border border-black/[0.08] dark:border-white/[0.08]"
+            >
+              <button
+                type="button"
+                role="radio"
+                aria-checked={isAutoMode}
+                onClick={() => handleToggleAutoMode('auto')}
+                className={`px-3 py-1 rounded-[7px] text-xs font-bold transition-all ${
+                  isAutoMode
+                    ? 'bg-[#3b82f6] text-white shadow-sm'
+                    : 'text-zinc-600 dark:text-[#9aa7b4] hover:text-zinc-900 dark:hover:text-[#e6edf3]'
+                }`}
+              >
+                Auto
+              </button>
+              <button
+                type="button"
+                role="radio"
+                aria-checked={!isAutoMode}
+                onClick={() => handleToggleAutoMode('manual')}
+                className={`px-3 py-1 rounded-[7px] text-xs font-bold transition-all ${
+                  !isAutoMode
+                    ? 'bg-[#3b82f6] text-white shadow-sm'
+                    : 'text-zinc-600 dark:text-[#9aa7b4] hover:text-zinc-900 dark:hover:text-[#e6edf3]'
+                }`}
+              >
+                Manual
+              </button>
+            </div>
+
+            {/* Real Equipment Power Toggle */}
             <button
-              onClick={() => setActiveTab('facility')}
-              className={`relative z-10 flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-colors ${
-                activeTab === 'facility'
-                  ? 'text-blue-600 dark:text-blue-400'
-                  : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
+              type="button"
+              onClick={handleTogglePower}
+              aria-label={isPowerOn ? 'Power Off HVAC Unit' : 'Power On HVAC Unit'}
+              aria-pressed={isPowerOn}
+              className={`px-3.5 py-1.5 rounded-[10px] text-xs font-bold border transition-all flex items-center gap-1.5 shadow-sm ${
+                isPowerOn
+                  ? 'bg-black/[0.04] dark:bg-white/[0.05] border-black/[0.1] dark:border-white/[0.1] text-zinc-800 dark:text-[#e6edf3] hover:border-black/[0.2] dark:hover:border-white/[0.2]'
+                  : 'bg-[#ef4444]/10 text-[#ef4444] border-[#ef4444]/30'
               }`}
             >
-              {activeTab === 'facility' && (
-                <motion.div
-                  layoutId="tab-switch-pill"
-                  className="absolute inset-0 bg-white dark:bg-zinc-800 rounded-xl shadow-sm -z-10"
-                  transition={{ type: 'spring', stiffness: 450, damping: 35 }}
-                />
-              )}
-              <Building2 className="w-4 h-4" />
-              <span>Facility & Remote Dispatch</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('technician')}
-              className={`relative z-10 flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-colors ${
-                activeTab === 'technician'
-                  ? 'text-amber-600 dark:text-amber-400'
-                  : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200'
-              }`}
-            >
-              {activeTab === 'technician' && (
-                <motion.div
-                  layoutId="tab-switch-pill"
-                  className="absolute inset-0 bg-white dark:bg-zinc-800 rounded-xl shadow-sm -z-10"
-                  transition={{ type: 'spring', stiffness: 450, damping: 35 }}
-                />
-              )}
-              <Wrench className="w-4 h-4" />
-              <span>Technician Diagnostics</span>
+              <Power className={`w-3.5 h-3.5 ${isPowerOn ? 'text-[#22c55e]' : 'text-[#ef4444]'}`} />
+              <span>{isPowerOn ? 'RUNNING' : 'STOPPED'}</span>
             </button>
           </div>
         </div>
-      </ScrollReveal>
+      </section>
 
-      {/* Quick Fault Simulation Action Controls */}
-      <ScrollReveal delay={0.05}>
-        <div className="bg-white dark:bg-[#121212] border border-zinc-200/90 dark:border-zinc-800/90 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-sm">
-          <div className="flex items-center gap-2 text-zinc-800 dark:text-zinc-200 text-xs font-bold uppercase tracking-wider">
-            <PlayCircle className="w-4 h-4 text-blue-500" />
-            <span>Interactive Fault Simulator:</span>
+      {/* 2. KPI ROW (Hero Room Temp + Sparklines + Ring Gauge) */}
+      <section aria-label="Key Performance Indicators" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        {/* HERO CARD: Room Temperature (Spans 2 columns on lg) */}
+        <MetricCard
+          title="Room Temperature"
+          value={currentTemp}
+          unit="°C"
+          icon={Thermometer}
+          color="blue"
+          isHero={true}
+          heroTarget={currentSetpoint.toFixed(1)}
+          delta={tempDelta}
+          deltaType={tempDelta && tempDelta.startsWith('+') ? 'positive' : 'negative'}
+          sparklineData={tempSparkline}
+          subtitle="Return Air Temperature"
+        />
+
+        {/* CARD 2: Relative Humidity with 40-60% Comfort Alert */}
+        <MetricCard
+          title="Relative Humidity"
+          value={currentHum}
+          unit="% RH"
+          icon={Droplets}
+          color={isHumidityOutOfRange ? 'amber' : 'green'}
+          delta={humDelta}
+          deltaType="neutral"
+          sparklineData={humSparkline}
+          subtitle="ASHRAE Standard: 40-60%"
+          alertBadge={isHumidityOutOfRange ? (
+            <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-[#f59e0b]/15 text-[#f59e0b] border border-[#f59e0b]/30">
+              Outside Comfort
+            </span>
+          ) : (
+            <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-[#22c55e]/15 text-[#22c55e] border border-[#22c55e]/30">
+              Optimal
+            </span>
+          )}
+        />
+
+        {/* CARD 3: Power Load */}
+        <MetricCard
+          title="Equipment Power"
+          value={currentPower >= 1000 ? (currentPower / 1000).toFixed(2) : currentPower}
+          unit={currentPower >= 1000 ? 'kW' : 'W'}
+          icon={Zap}
+          color="blue"
+          delta={powerDelta}
+          deltaType="neutral"
+          sparklineData={powerSparkline}
+          subtitle={`Pressure: ${latestReading?.pressure?.toFixed(1) || '101.3'} kPa`}
+        />
+
+        {/* CARD 4: System Health Score with Embedded HealthGauge Ring */}
+        <div className="rounded-[14px] border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-[#121821] p-4 sm:p-5 shadow-sm hover:border-black/[0.15] dark:hover:border-white/[0.15] transition-all flex flex-col justify-between">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold tracking-wider text-zinc-600 dark:text-[#9aa7b4] uppercase">
+              System Health
+            </span>
+            <span className={`px-2 py-0.5 rounded text-[11px] font-bold uppercase ${
+              (latestPrediction?.health_score ?? 95) >= 85
+                ? 'bg-[#22c55e]/15 text-[#22c55e] border border-[#22c55e]/30'
+                : (latestPrediction?.health_score ?? 95) >= 60
+                ? 'bg-[#f59e0b]/15 text-[#f59e0b] border border-[#f59e0b]/30'
+                : 'bg-[#ef4444]/15 text-[#ef4444] border border-[#ef4444]/30'
+            }`}>
+              {(latestPrediction?.severity || 'NORMAL')}
+            </span>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => triggerScenario('NORMAL')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm ${
-                simulation.scenario === 'NORMAL'
-                  ? 'hvac-btn-active-normal shadow-md'
-                  : 'hvac-btn-inactive'
-              }`}
-            >
-              NORMAL
-            </button>
-            <button
-              onClick={() => triggerScenario('FILTER_CLOGGING')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm ${
-                simulation.scenario === 'FILTER_CLOGGING'
-                  ? 'hvac-btn-active-filter shadow-md'
-                  : 'hvac-btn-inactive'
-              }`}
-            >
-              FILTER CLOGGING
-            </button>
-            <button
-              onClick={() => triggerScenario('COMPRESSOR_OVERLOAD')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm ${
-                simulation.scenario === 'COMPRESSOR_OVERLOAD'
-                  ? 'hvac-btn-active-overload shadow-md'
-                  : 'hvac-btn-inactive'
-              }`}
-            >
-              COMPRESSOR OVERLOAD
-            </button>
-            <button
-              onClick={() => triggerScenario('REFRIGERANT_LEAKAGE')}
-              className={`px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm ${
-                simulation.scenario === 'REFRIGERANT_LEAKAGE'
-                  ? 'hvac-btn-active-leakage shadow-md'
-                  : 'hvac-btn-inactive'
-              }`}
-            >
-              REFRIGERANT LEAKAGE
-            </button>
+
+          <div className="my-2 flex items-center justify-between">
+            <div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-3xl font-black font-mono tracking-tight text-zinc-900 dark:text-[#e6edf3]">
+                  {Math.round(latestPrediction?.health_score ?? 95)}
+                </span>
+                <span className="text-xs text-zinc-500 dark:text-[#9aa7b4] font-mono">/ 100</span>
+              </div>
+              <p className="text-xs text-zinc-500 dark:text-[#9aa7b4] capitalize mt-0.5">
+                {(latestPrediction?.predicted_fault || 'normal').replace('_', ' ')}
+              </p>
+            </div>
+
+            <HealthGauge score={latestPrediction?.health_score ?? 95} size="compact" />
+          </div>
+
+          <div className="pt-2 border-t border-black/[0.04] dark:border-white/[0.04] text-xs text-zinc-500 dark:text-[#9aa7b4]">
+            IsoForest Anomaly: <span className="font-mono font-bold text-zinc-700 dark:text-zinc-300">{latestPrediction?.anomaly_score ?? 0.05}</span>
           </div>
         </div>
-      </ScrollReveal>
+      </section>
 
-      {/* Staggered Entrance of Sensor Metric Cards (Powered by Anime.js & Framer Motion) */}
-      <StaggerContainer className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3">
-        <StaggerItem>
-          <MetricCard title="Indoor Temp" value={latestReading.temperature} unit="°C" icon={Thermometer} color="blue" />
-        </StaggerItem>
-        <StaggerItem>
-          <MetricCard title="Humidity" value={latestReading.humidity} unit="%" icon={Droplets} color="green" />
-        </StaggerItem>
-        <StaggerItem>
-          <MetricCard title="Pressure" value={latestReading.pressure} unit="kPa" icon={Gauge} color="purple" />
-        </StaggerItem>
-        <StaggerItem>
-          <MetricCard title="Current" value={latestReading.current} unit="A" icon={Activity} color="yellow" />
-        </StaggerItem>
-        <StaggerItem>
-          <MetricCard title="Power" value={latestReading.power} unit="W" icon={Zap} color="red" />
-        </StaggerItem>
-        <StaggerItem>
-          <MetricCard title="Occupancy" value={occupancyCount} unit="ppl" icon={Users} color="blue" />
-        </StaggerItem>
-        <StaggerItem>
-          <MetricCard title="Outdoor Temp" value={outdoorTemp} unit="°C" icon={Sun} color="yellow" />
-        </StaggerItem>
-      </StaggerContainer>
+      {/* 3. MAIN DUAL-COLUMN LAYOUT (Left Wide: Chart + AI Rec, Right: Thermostat Dial) */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+        
+        {/* LEFT COLUMN (7 cols): Main Chart & AI Suggestion */}
+        <div className="lg:col-span-7 flex flex-col justify-between space-y-6">
+          
+          {/* Main Dual-Axis Telemetry Chart */}
+          <div className="rounded-[14px] border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-[#121821] p-5 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-black/[0.06] dark:border-white/[0.06]">
+              <div>
+                <h2 className="text-sm font-bold text-zinc-900 dark:text-[#e6edf3]">
+                  Temperature vs Setpoint Trend
+                </h2>
+                <p className="text-xs text-zinc-500 dark:text-[#9aa7b4]">
+                  Dual-axis indoor return temperature (°C) & compressor power load (W)
+                </p>
+              </div>
 
-      {/* TAB CONTENT: Facility Overview vs Technician Diagnostics */}
-      {activeTab === 'facility' ? (
-        <>
-          {/* Universal HVAC Remote Control & AI Mode Optimizer */}
-          <ScrollReveal delay={0.1}>
-            <UniversalRemoteWidget unitId="HVAC-001" sensorData={latestReading} />
-          </ScrollReveal>
+              {/* Timeframe Selector Buttons */}
+              <div className="inline-flex rounded-[8px] bg-black/[0.04] dark:bg-white/[0.05] p-1 border border-black/[0.06] dark:border-white/[0.06]">
+                {['1h', '6h', '24h'].map((tf) => (
+                  <button
+                    key={tf}
+                    type="button"
+                    onClick={() => setTimeframe(tf)}
+                    className={`px-2.5 py-1 rounded-[6px] text-xs font-bold font-mono transition-all ${
+                      timeframe === tf
+                        ? 'bg-[#3b82f6] text-white shadow-sm'
+                        : 'text-zinc-600 dark:text-[#9aa7b4] hover:text-zinc-900 dark:hover:text-[#e6edf3]'
+                    }`}
+                  >
+                    {tf}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-          {/* Top Grid: Health Score + AI Diagnostics */}
-          <ScrollReveal delay={0.12}>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <HealthGauge score={latestPrediction.health_score} />
-
-              <div className="lg:col-span-2 bg-white dark:bg-[#121212] border border-zinc-200/90 dark:border-zinc-800/90 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
-                <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-3">
-                  <span className="text-xs font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
-                    AI Diagnostics & Fault Classification
-                  </span>
-                  <span className={`px-2.5 py-0.5 text-xs font-bold rounded-full ${
-                    latestPrediction.severity === 'Critical' ? 'bg-red-500/20 text-red-500 dark:text-red-400 border border-red-500/30' :
-                    latestPrediction.severity === 'High' ? 'bg-amber-500/20 text-amber-500 dark:text-amber-400 border border-amber-500/30' :
-                    'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
-                  }`}>
-                    SEVERITY: {latestPrediction.severity.toUpperCase()}
-                  </span>
+            {/* Recharts Dual-Axis Chart */}
+            <div className="h-64 sm:h-72 w-full pt-2">
+              {loadingHistory && chartPoints.length === 0 ? (
+                <div className="h-full flex items-center justify-center text-xs text-zinc-500">
+                  <RefreshCw className="w-4 h-4 animate-spin mr-2" />
+                  Loading telemetry records...
                 </div>
-
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-4">
-                  <div>
-                    <p className="text-xs text-zinc-400">Classified Fault</p>
-                    <p className="text-base font-bold text-zinc-900 dark:text-zinc-100 capitalize">
-                      {latestPrediction.predicted_fault.replace('_', ' ')}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-zinc-400">Confidence</p>
-                    <p className="text-base font-bold text-blue-600 dark:text-cyan-400">
-                      {latestPrediction.confidence}%
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-zinc-400">Anomaly Index</p>
-                    <p className="text-base font-bold text-purple-600 dark:text-purple-400">
-                      {latestPrediction.anomaly_score}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-zinc-400">Thermal Load</p>
-                    <p className="text-base font-bold text-amber-600 dark:text-amber-400">
-                      +{occupancyCount * 120}W
-                    </p>
-                  </div>
+              ) : chartPoints.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <ComposedChart data={chartPoints} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.06)" />
+                    <XAxis 
+                      dataKey="time" 
+                      stroke="#9aa7b4" 
+                      fontSize={11} 
+                      tickLine={false} 
+                      axisLine={{ stroke: 'rgba(255,255,255,0.08)' }} 
+                    />
+                    {/* Left Axis: Temperature (°C) */}
+                    <YAxis 
+                      yAxisId="left" 
+                      domain={['auto', 'auto']} 
+                      stroke="#9aa7b4" 
+                      fontSize={11} 
+                      unit="°C" 
+                      tickLine={false}
+                      axisLine={{ stroke: 'rgba(255,255,255,0.08)' }} 
+                    />
+                    {/* Right Axis: Power (W) */}
+                    <YAxis 
+                      yAxisId="right" 
+                      orientation="right" 
+                      stroke="#9aa7b4" 
+                      fontSize={11} 
+                      unit="W" 
+                      tickLine={false}
+                      axisLine={{ stroke: 'rgba(255,255,255,0.08)' }} 
+                    />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: '#121821', 
+                        borderColor: 'rgba(255,255,255,0.12)', 
+                        borderRadius: '10px', 
+                        fontSize: '12px',
+                        color: '#e6edf3'
+                      }} 
+                    />
+                    <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '8px' }} />
+                    <Area 
+                      yAxisId="left" 
+                      type="monotone" 
+                      dataKey="temperature" 
+                      name="Room Temp" 
+                      fill="rgba(59, 130, 246, 0.12)" 
+                      stroke="#3b82f6" 
+                      strokeWidth={2} 
+                    />
+                    <Line 
+                      yAxisId="left" 
+                      type="stepAfter" 
+                      dataKey="setpoint" 
+                      name="Target Setpoint" 
+                      stroke="#22c55e" 
+                      strokeDasharray="4 4" 
+                      strokeWidth={1.8} 
+                      dot={false} 
+                    />
+                    <Bar 
+                      yAxisId="right" 
+                      dataKey="power" 
+                      name="Power Load" 
+                      fill="rgba(245, 158, 11, 0.4)" 
+                      radius={[2, 2, 0, 0]} 
+                      barSize={6}
+                    />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="h-full flex items-center justify-center text-xs text-zinc-500">
+                  No historical telemetry found for selected timeframe.
                 </div>
+              )}
+            </div>
+          </div>
 
-                <div className="bg-zinc-50 dark:bg-[#181818] border border-zinc-200 dark:border-zinc-800 rounded-xl p-3 text-xs">
-                  <span className="font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block mb-1">
-                    Recommended Action:
-                  </span>
-                  <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed font-medium">
-                    {latestPrediction.recommended_action}
+          {/* Zone Environmental & Operating Parameters (Commercial BEMS Standards) */}
+          <div className="rounded-[14px] border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-[#121821] p-5 shadow-sm space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-black/[0.06] dark:border-white/[0.06]">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-[8px] bg-[#3b82f6]/10 text-[#3b82f6]">
+                  <Activity className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm font-bold text-zinc-900 dark:text-[#e6edf3]">
+                    Zone Environmental & Operating Telemetry
+                  </h3>
+                  <p className="text-xs text-zinc-500 dark:text-[#9aa7b4]">
+                    Supervisory air-side delivery, chiller coil delta-T & active compressor telemetry
                   </p>
                 </div>
               </div>
-            </div>
-          </ScrollReveal>
 
-          {/* Commercial B2B ROI & Sustainability Widget */}
-          <ScrollReveal delay={0.15}>
-            <CommercialROIWidget unitId="HVAC-001" />
-          </ScrollReveal>
-        </>
-      ) : (
-        /* TECHNICIAN VIEW */
-        <ScrollReveal delay={0.1}>
-          <TechnicianView unitId="HVAC-001" sensorData={latestReading} />
-        </ScrollReveal>
-      )}
-
-      {/* Telemetry Live Trend Area Chart */}
-      <ScrollReveal delay={0.18}>
-        <div className="bg-white dark:bg-[#121212] border border-zinc-200/90 dark:border-zinc-800/90 rounded-2xl p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
-                Live Power & Temperature Telemetry
-              </h3>
-              <p className="text-xs text-zinc-400">WebSocket real-time streaming</p>
+              <span className="text-[11px] font-semibold px-2.5 py-1 rounded-full bg-[#22c55e]/10 text-[#22c55e] border border-[#22c55e]/20 flex items-center gap-1.5 self-start sm:self-auto">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e] animate-pulse" />
+                <span>Nominal Operations</span>
+              </span>
             </div>
-            <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold">
-              ● Connected (1 Hz)
-            </span>
-          </div>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={telemetryHistory.length > 0 ? telemetryHistory : [latestReading]}>
-                <defs>
-                  <linearGradient id="powerGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
-                  </linearGradient>
-                  <linearGradient id="tempGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <XAxis dataKey="timestamp" tickFormatter={(t) => t ? t.substring(11, 19) : ''} stroke="#71717a" fontSize={11} />
-                <YAxis yAxisId="left" stroke="#3b82f6" fontSize={11} domain={['auto', 'auto']} />
-                <YAxis yAxisId="right" orientation="right" stroke="#ef4444" fontSize={11} domain={['auto', 'auto']} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: theme === 'dark' ? '#18181b' : '#ffffff', 
-                    borderColor: theme === 'dark' ? '#27272a' : '#e4e4e7',
-                    borderRadius: '12px',
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-                  }} 
-                />
-                <Area yAxisId="left" type="monotone" dataKey="power" name="Power (W)" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#powerGrad)" />
-                <Area yAxisId="right" type="monotone" dataKey="temperature" name="Temp (°C)" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#tempGrad)" />
-              </AreaChart>
-            </ResponsiveContainer>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {/* Supply Air */}
+              <div className="p-3 rounded-[10px] bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.06]">
+                <div className="flex items-center justify-between text-zinc-500 dark:text-[#9aa7b4] mb-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider">Supply Air Temp</span>
+                  <Thermometer className="w-3.5 h-3.5 text-[#3b82f6]" />
+                </div>
+                <div className="text-base font-extrabold text-zinc-900 dark:text-[#e6edf3] font-mono">
+                  {(Number(currentTemp) - 8.8).toFixed(1)}°C
+                </div>
+                <span className="text-[11px] text-zinc-500 dark:text-[#9aa7b4]">
+                  ΔT: 8.8°C cooling split
+                </span>
+              </div>
+
+              {/* Return Air */}
+              <div className="p-3 rounded-[10px] bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.06]">
+                <div className="flex items-center justify-between text-zinc-500 dark:text-[#9aa7b4] mb-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider">Return Plenum</span>
+                  <RefreshCw className="w-3.5 h-3.5 text-[#22c55e]" />
+                </div>
+                <div className="text-base font-extrabold text-zinc-900 dark:text-[#e6edf3] font-mono">
+                  {currentTemp}°C
+                </div>
+                <span className="text-[11px] text-zinc-500 dark:text-[#9aa7b4]">
+                  Zone equilibrium
+                </span>
+              </div>
+
+              {/* Airflow CFM */}
+              <div className="p-3 rounded-[10px] bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.06]">
+                <div className="flex items-center justify-between text-zinc-500 dark:text-[#9aa7b4] mb-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider">Airflow Delivery</span>
+                  <Wind className="w-3.5 h-3.5 text-sky-400" />
+                </div>
+                <div className="text-base font-extrabold text-zinc-900 dark:text-[#e6edf3] font-mono">
+                  1,250 CFM
+                </div>
+                <span className="text-[11px] text-zinc-500 dark:text-[#9aa7b4]">
+                  VAV branch nominal
+                </span>
+              </div>
+
+              {/* Dew Point */}
+              <div className="p-3 rounded-[10px] bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.06]">
+                <div className="flex items-center justify-between text-zinc-500 dark:text-[#9aa7b4] mb-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider">Dew Point</span>
+                  <Droplets className="w-3.5 h-3.5 text-cyan-400" />
+                </div>
+                <div className="text-base font-extrabold text-zinc-900 dark:text-[#e6edf3] font-mono">
+                  {(Number(currentTemp) - ((100 - Number(currentHum)) / 5)).toFixed(1)}°C
+                </div>
+                <span className="text-[11px] text-zinc-500 dark:text-[#9aa7b4]">
+                  Non-condensing zone
+                </span>
+              </div>
+
+              {/* Damper Fresh Air */}
+              <div className="p-3 rounded-[10px] bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.06]">
+                <div className="flex items-center justify-between text-zinc-500 dark:text-[#9aa7b4] mb-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider">OA Damper Intake</span>
+                  <Gauge className="w-3.5 h-3.5 text-indigo-400" />
+                </div>
+                <div className="text-base font-extrabold text-zinc-900 dark:text-[#e6edf3] font-mono">
+                  20% OA
+                </div>
+                <span className="text-[11px] text-zinc-500 dark:text-[#9aa7b4]">
+                  ASHRAE 62.1 fresh air
+                </span>
+              </div>
+
+              {/* Compressor Modulation */}
+              <div className="p-3 rounded-[10px] bg-black/[0.02] dark:bg-white/[0.03] border border-black/[0.06] dark:border-white/[0.06]">
+                <div className="flex items-center justify-between text-zinc-500 dark:text-[#9aa7b4] mb-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider">Compressor Load</span>
+                  <Zap className="w-3.5 h-3.5 text-[#f59e0b]" />
+                </div>
+                <div className="text-base font-extrabold text-zinc-900 dark:text-[#e6edf3] font-mono">
+                  {Math.min(100, Math.max(15, Math.round((currentPower / 1600) * 100)))}%
+                </div>
+                <span className="text-[11px] text-zinc-500 dark:text-[#9aa7b4]">
+                  VFD Inverter Stage
+                </span>
+              </div>
+            </div>
           </div>
         </div>
-      </ScrollReveal>
 
-      {/* Recent System Alerts */}
-      <ScrollReveal delay={0.2}>
-        <div className="bg-white dark:bg-[#121212] border border-zinc-200/90 dark:border-zinc-800/90 rounded-2xl p-5 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xs font-bold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
-              System Alerts & Maintenance Dispatch
-            </h3>
-            <span className="text-xs text-zinc-400 font-semibold">{alerts.length} Total Alerts</span>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-zinc-50 dark:bg-[#181818] text-zinc-500 uppercase border-b border-zinc-200 dark:border-zinc-800">
-                <tr>
-                  <th className="p-3">Severity</th>
-                  <th className="p-3">Title</th>
-                  <th className="p-3">Message</th>
-                  <th className="p-3">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-200/60 dark:divide-zinc-800/60 text-zinc-700 dark:text-zinc-300">
-                {alerts.slice(0, 5).map((alert) => (
-                  <tr key={alert.id} className="hover:bg-zinc-50 dark:hover:bg-zinc-800/40 transition">
-                    <td className="p-3">
-                      <span className={`px-2 py-0.5 font-bold rounded ${
-                        alert.severity === 'critical' ? 'bg-red-500/20 text-red-600 dark:text-red-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'
-                      }`}>
-                        {alert.severity.toUpperCase()}
-                      </span>
-                    </td>
-                    <td className="p-3 font-semibold text-zinc-900 dark:text-zinc-100">{alert.title}</td>
-                    <td className="p-3 truncate max-w-md">{alert.message}</td>
-                    <td className="p-3">
-                      {alert.is_resolved ? (
-                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Resolved</span>
-                      ) : (
-                        <span className="text-amber-600 dark:text-amber-400 font-semibold">Active</span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-                {alerts.length === 0 && (
-                  <tr>
-                    <td colSpan="4" className="p-4 text-center text-zinc-400">No active alerts recorded. System operating normally.</td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+        {/* RIGHT COLUMN (5 cols): Circular Thermostat Dial Remote Controller */}
+        <div className="lg:col-span-5 h-full">
+          <ThermostatDial
+            currentSetpoint={currentSetpoint}
+            currentMode={currentUnit?.current_mode || 'AUTO'}
+            currentFan={currentUnit?.fan_speed || 'AUTO'}
+            isPowerOn={isPowerOn}
+            isDemo={isDemo}
+            onApplyChanges={handleApplyThermostatChanges}
+            onPowerToggle={handleTogglePower}
+          />
         </div>
-      </ScrollReveal>
+      </div>
     </div>
   );
 }

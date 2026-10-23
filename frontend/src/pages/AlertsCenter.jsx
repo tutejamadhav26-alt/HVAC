@@ -27,7 +27,7 @@ export default function AlertsCenter() {
               onClick={() => setFilter(f)}
               className={`px-3.5 py-1.5 rounded-md text-xs font-semibold capitalize transition ${
                 filter === f
-                  ? 'bg-blue-600 text-white shadow'
+                  ? 'bg-emerald-600 text-white shadow'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -55,7 +55,7 @@ export default function AlertsCenter() {
                   <span className={`px-2.5 py-1 font-bold rounded text-xs inline-flex items-center gap-1 ${
                     alert.severity === 'critical' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
                     alert.severity === 'warning' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :
-                    'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                    'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
                   }`}>
                     {alert.severity === 'critical' && <AlertOctagon className="w-3.5 h-3.5" />}
                     {alert.severity === 'warning' && <AlertTriangle className="w-3.5 h-3.5" />}

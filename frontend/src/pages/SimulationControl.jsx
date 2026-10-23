@@ -39,7 +39,7 @@ export default function SimulationControl() {
       title: 'Random Fault Alternator',
       desc: 'Periodically cycles among all fault modes every 15 simulation cycles to test system dynamic response.',
       icon: Shuffle,
-      color: 'blue'
+      color: 'emerald'
     }
   ];
 
@@ -56,7 +56,7 @@ export default function SimulationControl() {
       <div className="bg-slate-800/80 border border-slate-700/60 rounded-xl p-6 shadow-lg flex items-center justify-between">
         <div>
           <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Active Scenario Mode</span>
-          <h2 className="text-2xl font-bold text-blue-400 mt-1">{simulation.scenario}</h2>
+          <h2 className="text-2xl font-bold text-emerald-400 mt-1">{simulation.scenario}</h2>
           <p className="text-xs text-slate-400 mt-1">Simulation Speed: <span className="font-bold text-slate-200">{simulation.speed_multiplier}x</span></p>
         </div>
         <div className="flex items-center gap-3">
@@ -79,7 +79,7 @@ export default function SimulationControl() {
               onClick={() => triggerScenario(simulation.scenario, speed)}
               className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 transition ${
                 simulation.speed_multiplier === speed
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                  ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-600/30'
                   : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
               }`}
             >
@@ -100,17 +100,17 @@ export default function SimulationControl() {
               onClick={() => triggerScenario(sc.id, simulation.speed_multiplier)}
               className={`cursor-pointer rounded-xl p-6 border transition-all duration-200 flex flex-col justify-between ${
                 isSelected
-                  ? 'bg-slate-800 border-blue-500 shadow-xl shadow-blue-500/10 ring-2 ring-blue-500/30'
+                  ? 'bg-slate-800 border-emerald-500 shadow-xl shadow-emerald-500/10 ring-2 ring-emerald-500/30'
                   : 'bg-slate-800/60 border-slate-700/60 hover:bg-slate-800 hover:border-slate-600'
               }`}
             >
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-blue-400">
+                  <div className="p-2.5 rounded-lg bg-slate-900 border border-slate-700 text-emerald-400">
                     <Icon className="w-6 h-6" />
                   </div>
                   {isSelected && (
-                    <span className="px-2.5 py-0.5 text-xs font-bold bg-blue-600 text-white rounded-full">ACTIVE</span>
+                    <span className="px-2.5 py-0.5 text-xs font-bold bg-emerald-600 text-white rounded-full">ACTIVE</span>
                   )}
                 </div>
                 <h3 className="text-base font-bold text-slate-100">{sc.title}</h3>
@@ -119,7 +119,7 @@ export default function SimulationControl() {
               <button
                 className={`mt-5 w-full py-2 rounded-lg text-xs font-bold transition ${
                   isSelected
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-emerald-600 text-white'
                     : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                 }`}
               >

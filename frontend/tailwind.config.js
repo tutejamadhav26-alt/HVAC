@@ -8,13 +8,29 @@ export default {
   theme: {
     extend: {
       colors: {
-        darkBg: "#0f172a",
-        cardBg: "#1e293b",
-        borderBg: "#334155",
-        brandBlue: "#3b82f6",
-        brandGreen: "#10b981",
-        brandYellow: "#f59e0b",
-        brandRed: "#ef4444"
+        // Semantic Commercial Building Design Tokens
+        bems: {
+          bg: 'var(--bems-bg)',
+          surface: 'var(--bems-surface)',
+          surfaceHover: 'var(--bems-surface-hover)',
+          border: 'var(--bems-border)',
+          text: 'var(--bems-text)',
+          muted: 'var(--bems-text-muted)',
+          accent: '#3b82f6',
+          accentHover: '#2563eb',
+          ok: '#22c55e',
+          warn: '#f59e0b',
+          danger: '#ef4444'
+        },
+        darkBg: "#0b0f14",
+        cardBg: "#121821",
+        borderBg: "rgba(255, 255, 255, 0.08)",
+      },
+      borderRadius: {
+        'panel': '14px',
+      },
+      fontFamily: {
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
       }
     },
   },

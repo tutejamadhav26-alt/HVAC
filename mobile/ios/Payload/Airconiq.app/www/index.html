@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Airconiq AI - Enterprise Climate Care</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --surface: #111827;
+      --surface-elevated: #1f293d;
+      --border: #1f2937;
+      --border-focus: #38bdf8;
+      --primary: #0284c7;
+      --primary-hover: #0369a1;
+      --primary-glow: rgba(2, 132, 199, 0.25);
+      --emerald: #10b981;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+      --purple: #8b5cf6;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-sub: #64748b;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-full: 9999px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* SPLASH SCREEN ANIMATION */
+    #splash-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: radial-gradient(circle at center, #111a2e 0%, #060911 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.6s;
+    }
+
+    .splash-logo-wrap {
+      position: relative;
+      width: 110px;
+      height: 110px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .splash-ring {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px solid rgba(56, 189, 248, 0.2);
+      animation: pulseRings 2.2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
+    }
+    .splash-ring:nth-child(2) {
+      animation-delay: 0.6s;
+    }
+
+    @keyframes pulseRings {
+      0% { transform: scale(0.8); opacity: 0.8; }
+      100% { transform: scale(1.7); opacity: 0; }
+    }
+
+    .splash-logo {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 20px rgba(56, 189, 248, 0.6));
+      animation: logoScale 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes logoScale {
+      0% { transform: scale(0.6); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .splash-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-top: 24px;
+      background: linear-gradient(135deg, #ffffff 40%, #93c5fd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .splash-tagline {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: var(--amber);
+      text-transform: uppercase;
+      margin-top: 6px;
+    }
+
+    .splash-loader-bar {
+      width: 140px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 36px;
+      position: relative;
+    }
+
+    .splash-loader-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #0284c7, #38bdf8);
+      animation: fillProgress 1.9s ease-in-out forwards;
+      border-radius: 2px;
+    }
+
+    @keyframes fillProgress {
+      0% { width: 0%; }
+      60% { width: 75%; }
+      100% { width: 100%; }
+    }
+
+    /* TOP HEADER (URBAN COMPANY STYLE) */
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(9, 13, 22, 0.95);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 12px 16px;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .location-selector {
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    .location-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .location-current {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 1px;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-main);
+      font-size: 14px;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .role-badge-btn {
+      padding: 6px 12px;
+      border-radius: var(--radius-full);
+      font-size: 11px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      border: 1px solid;
+    }
+
+    /* SEARCH BAR (URBAN COMPANY) */
+    .search-container {
+      margin-top: 12px;
+      position: relative;
+    }
+
+    .search-box {
+      width: 100%;
+      height: 44px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 0 42px 0 38px;
+      color: var(--text-main);
+      font-size: 13px;
+      font-weight: 500;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-box:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px var(--primary-glow);
+    }
+
+    .search-icon-left {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-sub);
+      font-size: 15px;
+    }
+
+    .search-icon-right {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--primary);
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    /* MAIN CONTAINER */
+    .main-body {
+      flex: 1;
+      padding-bottom: 90px;
+      overflow-y: auto;
+    }
+
+    /* HERO PROMO CAROUSEL (URBAN COMPANY) */
+    .hero-banner-wrap {
+      padding: 16px;
+    }
+
+    .hero-banner {
+      background: linear-gradient(135deg, #0f2744 0%, #071526 100%);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(2, 132, 199, 0.15);
+    }
+
+    .hero-banner::after {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 140px;
+      height: 140px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.2) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: var(--radius-full);
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--emerald);
+      font-size: 10px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .hero-title {
+      font-size: 19px;
+      font-weight: 800;
+      line-height: 1.3;
+      color: #ffffff;
+      max-width: 80%;
+    }
+
+    .hero-sub {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 6px;
+      line-height: 1.5;
+    }
+
+    .hero-metrics {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .hero-stat {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hero-stat-val {
+      font-size: 13px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+
+    .hero-stat-lbl {
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    /* URBAN COMPANY SIGNATURE CATEGORY GRID */
+    .section-title-wrap {
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-action {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary);
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .category-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 0 16px 20px 16px;
+    }
+
+    .category-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s, background 0.2s;
+    }
+
+    .category-card:active {
+      transform: scale(0.96);
+      background: var(--surface-elevated);
+      border-color: var(--border-focus);
+    }
+
+    .cat-icon-wrap {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 8px;
+    }
+
+    .cat-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.3;
+    }
+
+    .cat-badge {
+      font-size: 9px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-top: 6px;
+      background: rgba(2, 132, 199, 0.15);
+      color: #38bdf8;
+    }
+
+    /* TELEMETRY LIVE PULSE WIDGET */
+    .telemetry-card {
+      margin: 0 16px 20px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+    }
+
+    .telemetry-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .telemetry-tag {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+
+    .live-dot-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--emerald);
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--emerald);
+      animation: blink 1.4s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .metric-item {
+      background: #0b1120;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 8px 6px;
+      text-align: center;
+    }
+
+    .metric-val {
+      font-size: 15px;
+      font-weight: 800;
+      color: #ffffff;
+    }
+
+    .metric-lbl {
+      font-size: 10px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    /* SERVICE CARDS (URBAN COMPANY STYLE) */
+    .services-scroll {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 0 16px 24px 16px;
+    }
+
+    .service-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .service-card:hover {
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+
+    .service-info {
+      flex: 1;
+    }
+
+    .service-badge-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .service-rating {
+      font-size: 11px;
+      font-weight: 800;
+      color: #facc15;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .service-reviews {
+      font-size: 11px;
+      color: var(--text-sub);
+    }
+
+    .service-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-main);
+      line-height: 1.3;
+    }
+
+    .service-features {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .service-feat-item {
+      font-size: 12px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .service-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin-top: 12px;
+    }
+
+    .service-price {
+      font-size: 16px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+
+    .service-time {
+      font-size: 11px;
+      color: #64748b;
+    }
+
+    .service-action-side {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-width: 90px;
+    }
+
+    .service-img-thumb {
+      width: 82px;
+      height: 82px;
+      border-radius: var(--radius-md);
+      background: #0f172a;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .btn-book {
+      width: 100%;
+      height: 36px;
+      background: var(--surface-elevated);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-book:active {
+      background: var(--primary);
+      color: #ffffff;
+      transform: scale(0.96);
+    }
+
+    /* MODAL (BOTTOM SHEET FOR BOOKING & ROLES) */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .bottom-sheet {
+      width: 100%;
+      max-height: 85vh;
+      background: #111827;
+      border-top: 1px solid var(--border);
+      border-radius: 24px 24px 0 0;
+      padding: 24px 20px 36px 20px;
+      transform: translateY(100%);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow-y: auto;
+    }
+
+    .modal-backdrop.open .bottom-sheet {
+      transform: translateY(0);
+    }
+
+    .sheet-handle {
+      width: 40px;
+      height: 4px;
+      background: #374151;
+      border-radius: 2px;
+      margin: 0 auto 16px auto;
+    }
+
+    .sheet-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+
+    .sheet-sub {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-top: 4px;
+      margin-bottom: 20px;
+    }
+
+    /* ROLE ITEM CARDS */
+    .role-option-card {
+      background: #0d131f;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .role-option-card.selected {
+      border-color: var(--primary);
+      background: rgba(2, 132, 199, 0.1);
+    }
+
+    .role-option-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .role-option-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .role-option-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+
+    .role-option-desc {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    /* BOTTOM NAV BAR (URBAN COMPANY) */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 68px;
+      background: rgba(11, 17, 32, 0.96);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      z-index: 100;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .nav-tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-sub);
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 700;
+      transition: color 0.2s;
+      width: 20%;
+    }
+
+    .nav-tab.active {
+      color: #38bdf8;
+    }
+
+    .nav-tab-icon {
+      font-size: 19px;
+      transition: transform 0.2s;
+    }
+
+    .nav-tab.active .nav-tab-icon {
+      transform: scale(1.15);
+    }
+
+    /* TOAST ALERT */
+    #app-toast {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-100px);
+      background: #1f293d;
+      border: 1px solid var(--border-focus);
+      color: #f8fafc;
+      padding: 10px 18px;
+      border-radius: var(--radius-full);
+      font-size: 12px;
+      font-weight: 700;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      z-index: 10000;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #app-toast.visible {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* REMOTE CONTROL TAB VIEW */
+    .view-content {
+      display: none;
+    }
+    .view-content.active {
+      display: block;
+    }
+
+    .remote-dial-card {
+      margin: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      text-align: center;
+    }
+
+    .remote-dial-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 24px;
+      margin: 20px 0;
+    }
+
+    .dial-btn {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--surface-elevated);
+      border: 1px solid var(--border);
+      color: #ffffff;
+      font-size: 26px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .dial-btn:active {
+      background: var(--primary);
+    }
+
+    .dial-temp {
+      font-size: 54px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -1px;
+    }
+
+    .brand-pills-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 14px;
+    }
+
+    .brand-pill {
+      padding: 6px 14px;
+      border-radius: var(--radius-full);
+      background: #0b1120;
+      border: 1px solid var(--border);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+
+    .brand-pill.active {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: #38bdf8;
+    }
+
+    .btn-primary-block {
+      width: 100%;
+      height: 48px;
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: #ffffff;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.3);
+      margin-top: 16px;
+    }
+
+    .btn-primary-block:active {
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. OPENING SPLASH ANIMATION SCREEN -->
+  <div id="splash-screen">
+    <div class="splash-logo-wrap">
+      <div class="splash-ring"></div>
+      <div class="splash-ring"></div>
+      <img src="logo.png" alt="Airconiq" class="splash-logo" onerror="this.src='icon.png'">
+    </div>
+    <div class="splash-title">Airconiq AI</div>
+    <div class="splash-tagline">PREDICT • PREVENT • PERFORM</div>
+    <div class="splash-loader-bar">
+      <div class="splash-loader-fill"></div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="app-toast">
+    <span id="toast-icon">✔</span>
+    <span id="toast-text">Action completed successfully</span>
+  </div>
+
+  <!-- APP HEADER (URBAN COMPANY STYLE) -->
+  <header class="app-header">
+    <div class="header-top">
+      <div class="location-selector" onclick="openLocationModal()">
+        <span class="location-label">
+          <span>📍</span> FACILITY LOCATION
+        </span>
+        <span class="location-current" id="current-location">
+          Tower 4 • Cyber City BEMS ▾
+        </span>
+      </div>
+
+      <div class="header-actions">
+        <button class="role-badge-btn" id="active-role-pill" onclick="openRoleModal()" style="border-color: #10b981; color: #10b981; background: rgba(16, 185, 129, 0.1);">
+          <span style="width: 8px; height: 8px; border-radius: 50%; background: #10b981;"></span>
+          <span id="header-role-name">ADMIN</span>
+        </button>
+        <button class="icon-btn" onclick="showToast('Alerts: All 12 Chiller Loops Operating Normally', '🔔')">
+          🔔
+        </button>
+      </div>
+    </div>
+
+    <!-- URBAN COMPANY SMART SEARCH -->
+    <div class="search-container">
+      <span class="search-icon-left">🔍</span>
+      <input type="text" class="search-box" id="service-search-input" placeholder="Search AC service, gas refill, filter clean..." oninput="handleSearch(this.value)">
+      <span class="search-icon-right" onclick="showToast('Filters: All 6 Commercial Protocols Active', '⚙️')">⚙️</span>
+    </div>
+  </header>
+
+  <!-- MAIN SCROLLABLE CONTENT -->
+  <div class="main-body">
+
+    <!-- VIEW 1: DISCOVER & LANDING (URBAN COMPANY HOMEPAGE) -->
+    <div id="view-explore" class="view-content active">
+
+      <!-- HERO PROMOTIONAL BANNER -->
+      <div class="hero-banner-wrap">
+        <div class="hero-banner">
+          <div class="hero-pill">⚡ AUTONOMOUS BEMS 2.4</div>
+          <div class="hero-title">Monsoon Deep Diagnostics & Precision Tune-Up</div>
+          <div class="hero-sub">Certified Commercial HVAC Servicing • Guaranteed 18% Energy Cut</div>
+
+          <div class="hero-metrics">
+            <div class="hero-stat">
+              <span class="hero-stat-val">★ 4.94</span>
+              <span class="hero-stat-lbl">(18.4k ratings)</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-val">30 Mins</span>
+              <span class="hero-stat-lbl">Dispatch</span>
+            </div>
+            <div class="hero-stat">
+              <span class="hero-stat-val">99.4%</span>
+              <span class="hero-stat-lbl">Uptime SLA</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- URBAN COMPANY SIGNATURE 6-CATEGORY GRID -->
+      <div class="section-title-wrap">
+        <span class="section-title">Maintenance & Control Services</span>
+        <span class="section-action" onclick="showToast('Showing all 8 enterprise HVAC service tracks', '📋')">View All</span>
+      </div>
+
+      <div class="category-grid">
+        <div class="category-card" onclick="openBookingModal('AC Foam Wash & Jet Service', '❄️')">
+          <div class="cat-icon-wrap" style="background: rgba(2, 132, 199, 0.15); color: #38bdf8;">❄️</div>
+          <span class="cat-title">AC Jet Wash & Service</span>
+          <span class="cat-badge">POPULAR</span>
+        </div>
+
+        <div class="category-card" onclick="switchTab('remote')">
+          <div class="cat-icon-wrap" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">🎛️</div>
+          <span class="cat-title">Smart AI Remote</span>
+          <span class="cat-badge">IOT ACTIVE</span>
+        </div>
+
+        <div class="category-card" onclick="switchTab('health')">
+          <div class="cat-icon-wrap" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">🩺</div>
+          <span class="cat-title">AI Diagnostics & Faults</span>
+          <span class="cat-badge">REAL-TIME</span>
+        </div>
+
+        <div class="category-card" onclick="openBookingModal('Refrigerant Gas Leak & Pressure Fill', '🧪')">
+          <div class="cat-icon-wrap" style="background: rgba(139, 92, 246, 0.15); color: #a78bfa;">🧪</div>
+          <span class="cat-title">Gas Top-up & Leaks</span>
+          <span class="cat-badge">CERTIFIED</span>
+        </div>
+
+        <div class="category-card" onclick="openBookingModal('Duct HEPA & UV Air Sanitation', '🍃')">
+          <div class="cat-icon-wrap" style="background: rgba(20, 184, 166, 0.15); color: #2dd4bf;">🍃</div>
+          <span class="cat-title">Air Quality & Filters</span>
+          <span class="cat-badge">PM 2.5 CLEAN</span>
+        </div>
+
+        <div class="category-card" onclick="openBookingModal('Emergency Breakdown Breakdown Dispatch', '🚨')">
+          <div class="cat-icon-wrap" style="background: rgba(244, 63, 94, 0.15); color: #fb7185;">🚨</div>
+          <span class="cat-title">SOS Technician Dispatch</span>
+          <span class="cat-badge" style="background: rgba(244,63,94,0.2); color:#f43f5e;">15 MINS</span>
+        </div>
+      </div>
+
+      <!-- LIVE TELEMETRY HEALTH CARD -->
+      <div class="telemetry-card">
+        <div class="telemetry-head">
+          <span class="telemetry-tag">Live Sensor Waveform & Health</span>
+          <div class="live-dot-wrap">
+            <div class="live-dot"></div>
+            <span>TRANSMITTING</span>
+          </div>
+        </div>
+
+        <div class="metrics-row">
+          <div class="metric-item">
+            <div class="metric-val" id="tele-temp">24.0°C</div>
+            <div class="metric-lbl">Indoor Air</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-val" id="tele-hum">50.0%</div>
+            <div class="metric-lbl">Humidity</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-val" id="tele-press">101.3</div>
+            <div class="metric-lbl">kPa Pressure</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-val" id="tele-score" style="color: #10b981;">95/100</div>
+            <div class="metric-lbl">Health Score</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECOMMENDED SERVICE BOOKING CARDS (URBAN COMPANY CARDS) -->
+      <div class="section-title-wrap">
+        <span class="section-title">Recommended For Your Facility</span>
+      </div>
+
+      <div class="services-scroll">
+        <!-- Card 1 -->
+        <div class="service-card">
+          <div class="service-info">
+            <div class="service-badge-row">
+              <span class="service-rating">★ 4.92</span>
+              <span class="service-reviews">(14,280 reviews)</span>
+            </div>
+            <div class="service-title">Foam Jet Deep AC Cleaning & Coil Sanitization</div>
+            <div class="service-features">
+              <span class="service-feat-item">✔ High-pressure hydro-foam jet washing</span>
+              <span class="service-feat-item">✔ 30-Day Cooling Performance Guarantee</span>
+              <span class="service-feat-item">✔ Removes allergens, dirt &amp; mold buildup</span>
+            </div>
+            <div class="service-price-row">
+              <span class="service-price">₹1,299 / unit</span>
+              <span class="service-time">• 60 mins • Saves ~₹3,400/mo</span>
+            </div>
+          </div>
+          <div class="service-action-side">
+            <div class="service-img-thumb">❄️</div>
+            <button class="btn-book" onclick="openBookingModal('Foam Jet Deep AC Cleaning', '❄️')">BOOK NOW</button>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="service-card">
+          <div class="service-info">
+            <div class="service-badge-row">
+              <span class="service-rating">★ 4.88</span>
+              <span class="service-reviews">(8,940 reviews)</span>
+            </div>
+            <div class="service-title">Refrigerant Leak Detection & Precision Gas Top-Up</div>
+            <div class="service-features">
+              <span class="service-feat-item">✔ Electronic sniffer leak test &amp; brazing</span>
+              <span class="service-feat-item">✔ R32 / R410A Genuine Factory Refrigerant</span>
+              <span class="service-feat-item">✔ Restores instant sub-cooling efficiency</span>
+            </div>
+            <div class="service-price-row">
+              <span class="service-price">₹2,499</span>
+              <span class="service-time">• 45 mins</span>
+            </div>
+          </div>
+          <div class="service-action-side">
+            <div class="service-img-thumb">🧪</div>
+            <button class="btn-book" onclick="openBookingModal('Refrigerant Gas Leak & Refill', '🧪')">BOOK NOW</button>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="service-card">
+          <div class="service-info">
+            <div class="service-badge-row">
+              <span class="service-rating">★ 4.96</span>
+              <span class="service-reviews">(21,300 audits)</span>
+            </div>
+            <div class="service-title">Comprehensive AI Vibration & Motor Bearing Diagnostic</div>
+            <div class="service-features">
+              <span class="service-feat-item">✔ FFT Vibration Spectrum Anomaly Scan</span>
+              <span class="service-feat-item">✔ Electrical current harmonics &amp; motor health</span>
+              <span class="service-feat-item">✔ Certified Preventative Maintenance Report</span>
+            </div>
+            <div class="service-price-row">
+              <span class="service-price">Included</span>
+              <span class="service-time">• BEMS SLA Subscription</span>
+            </div>
+          </div>
+          <div class="service-action-side">
+            <div class="service-img-thumb">🩺</div>
+            <button class="btn-book" onclick="openBookingModal('AI Motor Bearing Diagnostic', '🩺')">SCHEDULE</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: UNIVERSAL SMART REMOTE -->
+    <div id="view-remote" class="view-content">
+      <div style="padding: 16px;">
+        <h2 style="font-size: 20px; font-weight: 800;">Smart Universal Remote</h2>
+        <p style="font-size: 12px; color: #94a3b8; margin-top: 2px;">Direct IoT protocol transmission to commercial VRV/Chillers</p>
+      </div>
+
+      <div class="remote-dial-card">
+        <span style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">SELECT PROTOCOL BRAND</span>
+        <div class="brand-pills-row">
+          <div class="brand-pill active" onclick="selectBrand(this, 'Daikin')">Daikin</div>
+          <div class="brand-pill" onclick="selectBrand(this, 'Carrier')">Carrier</div>
+          <div class="brand-pill" onclick="selectBrand(this, 'Panasonic')">Panasonic</div>
+          <div class="brand-pill" onclick="selectBrand(this, 'Toshiba')">Toshiba</div>
+          <div class="brand-pill" onclick="selectBrand(this, 'Voltas')">Voltas</div>
+          <div class="brand-pill" onclick="selectBrand(this, 'LG')">LG Multi V</div>
+        </div>
+
+        <div style="margin-top: 24px; font-size: 12px; color: var(--emerald); font-weight: 700;">
+          ⚡ AI Dynamic Occupancy Optimizer Active (Save ~18.5% Power)
+        </div>
+
+        <div class="remote-dial-controls">
+          <button class="dial-btn" onclick="adjustTemp(-0.5)">−</button>
+          <div class="dial-temp"><span id="target-temp">24.0</span>°C</div>
+          <button class="dial-btn" onclick="adjustTemp(0.5)">+</button>
+        </div>
+
+        <div style="display: flex; gap: 8px; justify-content: center; margin-top: 10px;">
+          <button class="brand-pill active" onclick="selectMode(this, 'AUTO')">AUTO ECO</button>
+          <button class="brand-pill" onclick="selectMode(this, 'COOL')">COOL JET</button>
+          <button class="brand-pill" onclick="selectMode(this, 'DRY')">DEHUMIDIFY</button>
+          <button class="brand-pill" onclick="selectMode(this, 'FAN')">FAN CIRCULATE</button>
+        </div>
+
+        <button class="btn-primary-block" onclick="transmitRemoteCommand()">
+          <span>📡</span> TRANSMIT COMMAND TO <span id="selected-brand-label">DAIKIN</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- VIEW 3: LIVE SENSORS & DIAGNOSTICS -->
+    <div id="view-health" class="view-content">
+      <div style="padding: 16px;">
+        <h2 style="font-size: 20px; font-weight: 800;">Autonomous Telemetry</h2>
+        <p style="font-size: 12px; color: #94a3b8; margin-top: 2px;">Real-time sensory diagnostics & fault classification</p>
+      </div>
+
+      <div style="padding: 0 16px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px;">
+          <div style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">CLASSIFIED ANOMALY STATE</div>
+          <div style="font-size: 24px; font-weight: 800; color: #38bdf8; margin-top: 4px;" id="diag-fault">NORMAL OPERATION</div>
+          <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Confidence: <strong style="color: #f8fafc;" id="diag-conf">98.5%</strong> • Anomaly Score: 0.05</div>
+        </div>
+
+        <div style="background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px;">
+          <div style="font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase;">COMPRESSOR &amp; ELECTRICAL LOAD</div>
+          <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+            <div>
+              <div style="font-size: 12px; color: #64748b;">Current Draw</div>
+              <div style="font-size: 18px; font-weight: 800; color: #f8fafc;" id="diag-curr">4.80 A RMS</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #64748b;">Active Power</div>
+              <div style="font-size: 18px; font-weight: 800; color: #f8fafc;" id="diag-pow">1,050 Watts</div>
+            </div>
+            <div>
+              <div style="font-size: 12px; color: #64748b;">Thermal Load</div>
+              <div style="font-size: 18px; font-weight: 800; color: var(--emerald);">+720W (6 Pax)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 4: ACTIVE BOOKINGS & DISPATCH -->
+    <div id="view-orders" class="view-content">
+      <div style="padding: 16px;">
+        <h2 style="font-size: 20px; font-weight: 800;">Technician Dispatch Tracker</h2>
+        <p style="font-size: 12px; color: #94a3b8; margin-top: 2px;">Real-time service execution tracking</p>
+      </div>
+
+      <div style="margin: 0 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between;">
+          <span style="font-size: 11px; font-weight: 800; padding: 4px 8px; border-radius: 4px; background: rgba(16,185,129,0.15); color: var(--emerald);">
+            ● TECHNICIAN ASSIGNED
+          </span>
+          <span style="font-size: 12px; color: #94a3b8;">Order #HVAC-9281</span>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 14px; margin-top: 16px;">
+          <div style="width: 52px; height: 52px; border-radius: 50%; background: #1e293b; border: 2px solid #0284c7; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+            👨‍🔧
+          </div>
+          <div>
+            <div style="font-size: 16px; font-weight: 800; color: #f8fafc;">Rajesh Sharma</div>
+            <div style="font-size: 12px; color: #94a3b8;">Chief HVAC Field Specialist • ★ 4.92 (1,420 jobs)</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px; padding: 14px; background: #0b1120; border-radius: 12px; border: 1px solid var(--border);">
+          <div style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase;">STATUS TIMELINE</div>
+          <div style="margin-top: 10px; display: flex; flex-direction: column; gap: 10px; font-size: 12px;">
+            <div style="display: flex; gap: 10px; align-items: center; color: var(--emerald);">
+              <span>✔</span> <span>12:20 PM - Work order accepted</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; color: #38bdf8;">
+              <span>🚚</span> <span>12:25 PM - In transit to Tower 4 (ETA: 12 mins)</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; color: #64748b;">
+              <span>⏱</span> <span>12:40 PM - High-pressure foam wash & sensor diagnostic</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-primary-block" onclick="showToast('Calling Field Dispatch Specialist: Rajesh Sharma', '📞')">
+          <span>📞</span> Call Technician
+        </button>
+      </div>
+    </div>
+
+    <!-- VIEW 5: MULTIPLE ACCESS & PROFILE (AUTH PAGE) -->
+    <div id="view-profile" class="view-content">
+      <div style="padding: 16px;">
+        <h2 style="font-size: 20px; font-weight: 800;">Multiple Access & Authentication</h2>
+        <p style="font-size: 12px; color: #94a3b8; margin-top: 2px;">Enterprise Role-Based Access Control</p>
+      </div>
+
+      <div style="padding: 0 16px;">
+        <!-- ROLE SELECTOR CARDS -->
+        <div class="role-option-card selected" id="opt-admin" onclick="selectRole('admin', 'Facility Director', '#10b981')">
+          <div class="role-option-info">
+            <div class="role-option-dot" style="background: #10b981;"></div>
+            <div>
+              <div class="role-option-name">Facility Director (Admin)</div>
+              <div class="role-option-desc">Full master access, setpoints, remote controls & overrides</div>
+            </div>
+          </div>
+          <span style="font-size: 11px; font-weight: 800; color: #10b981;">ACTIVE</span>
+        </div>
+
+        <div class="role-option-card" id="opt-technician" onclick="selectRole('technician', 'Field Specialist', '#f59e0b')">
+          <div class="role-option-info">
+            <div class="role-option-dot" style="background: #f59e0b;"></div>
+            <div>
+              <div class="role-option-name">Certified Field Specialist (Tech)</div>
+              <div class="role-option-desc">Autonomous telemetry sweeps, IR remote & dispatch logs</div>
+            </div>
+          </div>
+          <span style="font-size: 11px; font-weight: 800; color: #64748b;">SWITCH</span>
+        </div>
+
+        <div class="role-option-card" id="opt-auditor" onclick="selectRole('auditor', 'ESG Energy Auditor', '#8b5cf6')">
+          <div class="role-option-info">
+            <div class="role-option-dot" style="background: #8b5cf6;"></div>
+            <div>
+              <div class="role-option-name">ESG Energy Auditor (Auditor)</div>
+              <div class="role-option-desc">kW/kWh power analytics, thermal load & carbon savings</div>
+            </div>
+          </div>
+          <span style="font-size: 11px; font-weight: 800; color: #64748b;">SWITCH</span>
+        </div>
+
+        <div class="role-option-card" id="opt-staff" onclick="selectRole('staff', 'Building Occupant', '#38bdf8')">
+          <div class="role-option-info">
+            <div class="role-option-dot" style="background: #38bdf8;"></div>
+            <div>
+              <div class="role-option-name">Building Occupant (Staff)</div>
+              <div class="role-option-desc">Comfort climate monitoring & zone setpoint view</div>
+            </div>
+          </div>
+          <span style="font-size: 11px; font-weight: 800; color: #64748b;">SWITCH</span>
+        </div>
+
+        <!-- AUTH LOGIN FORM (URBAN COMPANY ENTERPRISE LOGIN) -->
+        <div style="margin-top: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px;">
+          <div style="font-size: 14px; font-weight: 800; color: #f8fafc;">Enterprise Phone / Token Login</div>
+          <div style="font-size: 12px; color: #94a3b8; margin-top: 4px;">Sign in with registered facility mobile or SSO token</div>
+
+          <div style="margin-top: 14px; display: flex; gap: 8px;">
+            <div style="width: 70px; height: 42px; background: #0b1120; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700;">
+              🇮🇳 +91
+            </div>
+            <input type="tel" placeholder="Enter 10-digit mobile number" style="flex: 1; height: 42px; background: #0b1120; border: 1px solid var(--border); border-radius: 8px; padding: 0 12px; color: #fff; font-size: 13px; outline: none;">
+          </div>
+
+          <button class="btn-primary-block" onclick="showToast('OTP sent to your registered mobile (Simulated: 482910)', '🔑')">
+            Get Security OTP
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOOKING MODAL (BOTTOM SHEET) -->
+  <div class="modal-backdrop" id="booking-modal" onclick="closeModalOnBg(event, 'booking-modal')">
+    <div class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title" id="book-modal-title">Book Service</div>
+      <div class="sheet-sub">Certified commercial HVAC technicians with 30-day warranty</div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <div>
+          <label style="font-size: 11px; font-weight: 700; color: #94a3b8;">SELECT HVAC UNIT / CHILLER</label>
+          <select style="width: 100%; height: 42px; background: #0b1120; border: 1px solid var(--border); border-radius: 8px; color: #fff; padding: 0 10px; margin-top: 4px; font-size: 13px;">
+            <option>HVAC-001 (Tower 4 • Daikin VRV 12HP)</option>
+            <option>HVAC-002 (Tower 4 • Carrier Screw Chiller)</option>
+            <option>HVAC-003 (Executive Floor • Panasonic Inverter)</option>
+            <option>HVAC-004 (Server Room • Voltas Precision AC)</option>
+          </select>
+        </div>
+
+        <div>
+          <label style="font-size: 11px; font-weight: 700; color: #94a3b8;">PREFERRED TIME SLOT</label>
+          <div style="display: flex; gap: 8px; margin-top: 4px;">
+            <button class="brand-pill active" style="flex: 1; text-align: center;">⚡ Immediate (30 min)</button>
+            <button class="brand-pill" style="flex: 1; text-align: center;">📅 Tomorrow 10 AM</button>
+          </div>
+        </div>
+
+        <div style="background: #0b1120; border-radius: 12px; padding: 12px; border: 1px solid var(--border); margin-top: 8px;">
+          <div style="display: flex; justify-content: space-between; font-size: 12px;">
+            <span style="color: #94a3b8;">Inspection &amp; Labor</span>
+            <span style="color: #f8fafc; font-weight: 700;">₹1,299</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-size: 12px; margin-top: 4px;">
+            <span style="color: #94a3b8;">Estimated Power Saved</span>
+            <span style="color: var(--emerald); font-weight: 700;">-₹3,400 / mo</span>
+          </div>
+        </div>
+
+        <button class="btn-primary-block" onclick="confirmBooking()">
+          Confirm &amp; Dispatch Field Technician
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROLE SWITCH MODAL -->
+  <div class="modal-backdrop" id="role-modal" onclick="closeModalOnBg(event, 'role-modal')">
+    <div class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">Multiple Access Profiles</div>
+      <div class="sheet-sub">Switch roles instantly to test RBAC permissions</div>
+
+      <div class="role-option-card" onclick="selectRole('admin', 'Facility Director', '#10b981'); closeRoleModal();">
+        <div class="role-option-info">
+          <div class="role-option-dot" style="background: #10b981;"></div>
+          <div>
+            <div class="role-option-name">Facility Director (Admin)</div>
+            <div class="role-option-desc">Full master access, setpoints, remote controls & overrides</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="role-option-card" onclick="selectRole('technician', 'Field Specialist', '#f59e0b'); closeRoleModal();">
+        <div class="role-option-info">
+          <div class="role-option-dot" style="background: #f59e0b;"></div>
+          <div>
+            <div class="role-option-name">Certified Field Specialist (Tech)</div>
+            <div class="role-option-desc">Autonomous telemetry sweeps, IR remote & dispatch logs</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="role-option-card" onclick="selectRole('auditor', 'ESG Energy Auditor', '#8b5cf6'); closeRoleModal();">
+        <div class="role-option-info">
+          <div class="role-option-dot" style="background: #8b5cf6;"></div>
+          <div>
+            <div class="role-option-name">ESG Energy Auditor (Auditor)</div>
+            <div class="role-option-desc">kW/kWh power analytics, thermal load & carbon savings</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="role-option-card" onclick="selectRole('staff', 'Building Occupant', '#38bdf8'); closeRoleModal();">
+        <div class="role-option-info">
+          <div class="role-option-dot" style="background: #38bdf8;"></div>
+          <div>
+            <div class="role-option-name">Building Occupant (Staff)</div>
+            <div class="role-option-desc">Comfort climate monitoring & zone setpoint view</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- URBAN COMPANY BOTTOM NAVIGATION BAR -->
+  <nav class="bottom-nav">
+    <div class="nav-tab active" id="tab-explore" onclick="switchTab('explore')">
+      <span class="nav-tab-icon">🏠</span>
+      <span>Explore</span>
+    </div>
+    <div class="nav-tab" id="tab-remote" onclick="switchTab('remote')">
+      <span class="nav-tab-icon">🎛️</span>
+      <span>Remote</span>
+    </div>
+    <div class="nav-tab" id="tab-health" onclick="switchTab('health')">
+      <span class="nav-tab-icon">🩺</span>
+      <span>Telemetry</span>
+    </div>
+    <div class="nav-tab" id="tab-orders" onclick="switchTab('orders')">
+      <span class="nav-tab-icon">🚚</span>
+      <span>Dispatch</span>
+    </div>
+    <div class="nav-tab" id="tab-profile" onclick="switchTab('profile')">
+      <span class="nav-tab-icon">👤</span>
+      <span>Access</span>
+    </div>
+  </nav>
+
+  <script>
+    // Dismiss Splash Screen after smooth intro
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const splash = document.getElementById('splash-screen');
+        splash.style.opacity = '0';
+        setTimeout(() => splash.style.display = 'none', 600);
+      }, 2100);
+    });
+
+    // App State
+    let currentBrand = 'Daikin';
+    let currentTargetTemp = 24.0;
+    let currentMode = 'AUTO';
+    let currentRole = 'admin';
+
+    // Toast Notification helper
+    function showToast(msg, icon = '✔') {
+      const toast = document.getElementById('app-toast');
+      document.getElementById('toast-icon').textContent = icon;
+      document.getElementById('toast-text').textContent = msg;
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), 3200);
+    }
+
+    // Navigation Switcher
+    function switchTab(viewId) {
+      document.querySelectorAll('.view-content').forEach(v => v.classList.remove('active'));
+      document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+
+      const targetView = document.getElementById('view-' + viewId);
+      const targetTab = document.getElementById('tab-' + viewId);
+
+      if (targetView) targetView.classList.add('active');
+      if (targetTab) targetTab.classList.add('active');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Remote functions
+    function selectBrand(el, brand) {
+      document.querySelectorAll('.brand-pills-row .brand-pill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      currentBrand = brand;
+      document.getElementById('selected-brand-label').textContent = brand.toUpperCase();
+      showToast(`Connected to ${brand} Protocol Driver`, '📡');
+    }
+
+    function selectMode(el, mode) {
+      el.parentElement.querySelectorAll('.brand-pill').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      currentMode = mode;
+    }
+
+    function adjustTemp(delta) {
+      currentTargetTemp = +(currentTargetTemp + delta).toFixed(1);
+      document.getElementById('target-temp').textContent = currentTargetTemp.toFixed(1);
+    }
+
+    function transmitRemoteCommand() {
+      if (currentRole === 'staff') {
+        showToast('Access Denied: Occupant role cannot override setpoint.', '⚠️');
+        return;
+      }
+      showToast(`Transmitted ${currentMode} @ ${currentTargetTemp}°C to ${currentBrand}`, '📡');
+    }
+
+    // Role selection
+    function selectRole(roleId, roleName, color) {
+      currentRole = roleId;
+      document.getElementById('header-role-name').textContent = roleId.toUpperCase();
+      const pill = document.getElementById('active-role-pill');
+      pill.style.borderColor = color;
+      pill.style.color = color;
+      pill.style.backgroundColor = color + '1a';
+      pill.querySelector('span').style.backgroundColor = color;
+
+      document.querySelectorAll('.role-option-card').forEach(c => {
+        c.classList.remove('selected');
+        c.querySelector('span:last-child').textContent = 'SWITCH';
+        c.querySelector('span:last-child').style.color = '#64748b';
+      });
+
+      const opt = document.getElementById('opt-' + roleId);
+      if (opt) {
+        opt.classList.add('selected');
+        opt.querySelector('span:last-child').textContent = 'ACTIVE';
+        opt.querySelector('span:last-child').style.color = color;
+      }
+
+      showToast(`Switched profile to ${roleName}`, '👤');
+    }
+
+    function openRoleModal() {
+      document.getElementById('role-modal').classList.add('open');
+    }
+
+    function closeRoleModal() {
+      document.getElementById('role-modal').classList.remove('open');
+    }
+
+    // Booking modal
+    function openBookingModal(title, icon) {
+      document.getElementById('book-modal-title').textContent = `${icon} ${title}`;
+      document.getElementById('booking-modal').classList.add('open');
+    }
+
+    function confirmBooking() {
+      document.getElementById('booking-modal').classList.remove('open');
+      showToast('Technician Dispatched! Rajesh Sharma arriving in 24 mins', '🚚');
+      setTimeout(() => switchTab('orders'), 800);
+    }
+
+    function closeModalOnBg(e, modalId) {
+      if (e.target.id === modalId) {
+        document.getElementById(modalId).classList.remove('open');
+      }
+    }
+
+    function openLocationModal() {
+      showToast('Facility: Tower 4 • Central Cyber City BEMS Active', '🏢');
+    }
+
+    function handleSearch(val) {
+      if (!val) return;
+      const lower = val.toLowerCase();
+      if (lower.includes('gas') || lower.includes('leak')) {
+        showToast('Found: Refrigerant Gas Leak Detection & Recharge', '🔍');
+      } else if (lower.includes('clean') || lower.includes('foam')) {
+        showToast('Found: Foam Jet Deep AC Cleaning & Coil Sanitization', '🔍');
+      } else if (lower.includes('remote') || lower.includes('temp')) {
+        switchTab('remote');
+      }
+    }
+
+    // Dynamic Live Telemetry Simulator (connected to backend if available)
+    setInterval(() => {
+      const tempVariation = (23.8 + Math.random() * 0.5).toFixed(1);
+      const humVariation = (49.5 + Math.random() * 1.2).toFixed(1);
+      const powVariation = Math.round(1040 + Math.random() * 25);
+      
+      const elTemp = document.getElementById('tele-temp');
+      const elHum = document.getElementById('tele-hum');
+      const elPow = document.getElementById('diag-pow');
+
+      if (elTemp) elTemp.textContent = tempVariation + '°C';
+      if (elHum) elHum.textContent = humVariation + '%';
+      if (elPow) elPow.textContent = powVariation.toLocaleString() + ' W';
+    }, 3000);
+  </script>
+</body>
+</html>

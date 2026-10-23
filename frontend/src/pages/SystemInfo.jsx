@@ -49,7 +49,7 @@ export default function SystemInfo() {
           return (
             <div key={idx} className="bg-slate-800/80 border border-slate-700/60 rounded-xl p-5 shadow-lg flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-blue-500/10 border border-blue-500/20 rounded-lg text-blue-400">
+                <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg text-emerald-400">
                   <Icon className="w-5 h-5" />
                 </div>
                 <div>

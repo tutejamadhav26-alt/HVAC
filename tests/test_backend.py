@@ -156,3 +156,71 @@ def test_ml_inference_7_features():
     assert "predicted_power_next" in res
     assert res["predicted_power_next"] > 0
 
+
+def test_device_capabilities():
+    response = client.get("/api/hvac/HVAC-001/capabilities")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["unit_id"] == "HVAC-001"
+    assert "supported_modes" in data
+    assert data["min_temperature"] <= 18.0
+    assert data["max_temperature"] >= 28.0
+
+
+def test_device_remote_command_execution():
+    cmd_payload = {
+        "unit_id": "HVAC-001",
+        "power_state": True,
+        "target_temperature": 23.0,
+        "mode": "COOL",
+        "fan_speed": "HIGH",
+        "triggered_by": "qa_test"
+    }
+    response = client.post("/api/hvac/HVAC-001/command", json=cmd_payload)
+    assert response.status_code == 200
+    res = response.json()
+    assert res["success"] is True
+    assert res["applied_state"]["target_temperature"] == 23.0
+    assert res["applied_state"]["mode"] == "COOL"
+
+
+def test_device_command_safety_validation():
+    # Attempt to set temperature beyond allowable limits (e.g. 12.0°C)
+    cmd_invalid = {
+        "unit_id": "HVAC-001",
+        "target_temperature": 12.0
+    }
+    response = client.post("/api/hvac/HVAC-001/command", json=cmd_invalid)
+    assert response.status_code == 400
+    assert "below minimum allowable limit" in response.json()["detail"]
+
+
+def test_unified_ai_recommendation():
+    response = client.get("/api/predictions/unified-recommendation?unit_id=HVAC-001")
+    assert response.status_code == 200
+    data = response.json()
+    assert "current_conditions" in data
+    assert "ml_model_diagnosis" in data
+    assert "setpoint_recommendation" in data
+    assert "strategy_distinction" in data
+    assert data["ml_model_diagnosis"]["predicted_fault"] in ["normal", "filter_clogging", "compressor_overload", "refrigerant_leakage"]
+    assert data["setpoint_recommendation"]["target_temperature"] >= 16.0
+
+
+def test_system_settings_and_auto_mode():
+    # 1. Get settings
+    get_res = client.get("/api/system/settings")
+    assert get_res.status_code == 200
+    settings = get_res.json()
+    assert "min_allowable_setpoint" in settings
+    assert "max_allowable_setpoint" in settings
+
+    # 2. Update settings
+    put_res = client.put("/api/system/settings", json={"min_allowable_setpoint": 18.5, "max_allowable_setpoint": 27.5})
+    assert put_res.status_code == 200
+
+    # 3. Trigger auto mode eval
+    eval_res = client.post("/api/system/evaluate-auto-mode")
+    assert eval_res.status_code == 200
+    assert "actions_taken" in eval_res.json()
+

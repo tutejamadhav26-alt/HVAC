@@ -2,24 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Base Font & Theme Transition */
+/* Base Font, Numeric Readouts & Theme Transition */
+:root {
+  --bems-bg: #f8fafc;
+  --bems-surface: #ffffff;
+  --bems-surface-hover: #f1f5f9;
+  --bems-border: rgba(0, 0, 0, 0.08);
+  --bems-text: #0f172a;
+  --bems-text-muted: #64748b;
+  --bems-accent: #3b82f6;
+  --bems-ok: #22c55e;
+  --bems-warn: #f59e0b;
+  --bems-danger: #ef4444;
+}
+
+html.dark {
+  --bems-bg: #0b0f14;
+  --bems-surface: #121821;
+  --bems-surface-hover: #17202c;
+  --bems-border: rgba(255, 255, 255, 0.08);
+  --bems-text: #e6edf3;
+  --bems-text-muted: #9aa7b4;
+  --bems-accent: #3b82f6;
+  --bems-ok: #22c55e;
+  --bems-warn: #f59e0b;
+  --bems-danger: #ef4444;
+}
+
 html {
   scroll-behavior: smooth;
+  font-feature-settings: "tnum" 1, "cv02" 1, "cv03" 1, "cv04" 1;
 }
 
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   transition: background-color 0.15s ease, color 0.15s ease;
   overflow-x: hidden;
+  background-color: var(--bems-bg);
+  color: var(--bems-text);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  line-height: 1.5;
 }
 
-/* ============================================================
-   1. TRUE BLACK DARK THEME (GeeksforGeeks / GitHub Dark / Industrial)
-   ZERO Navy Blue Tint! Pure Deep Black, Graphite & Charcoal.
-   ============================================================ */
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 html.dark body {
-  background-color: #0a0a0a !important;
-  color: #f4f4f5 !important;
+  background-color: #0b0f14 !important;
+  color: #e6edf3 !important;
 }
 
 /* Sidebar and Main background wrappers in Dark Mode: Jet Black */
@@ -184,20 +222,17 @@ html:not(.dark) .text-slate-500 {
   color: #71717a !important;
 }
 
-/* Color Contrast Synchronization in Light Mode */
+/* Color Contrast Synchronization in Light Mode - Zero Blue Theme */
 html:not(.dark) .text-cyan-300,
-html:not(.dark) .text-cyan-400 {
-  color: #0284c7 !important; /* Deep rich sky blue */
+html:not(.dark) .text-cyan-400,
+html:not(.dark) .text-blue-300,
+html:not(.dark) .text-blue-400 {
+  color: #047857 !important; /* Deep rich emerald */
 }
 
 html:not(.dark) .text-teal-300,
 html:not(.dark) .text-teal-400 {
   color: #0f766e !important; /* Deep rich teal */
-}
-
-html:not(.dark) .text-blue-300,
-html:not(.dark) .text-blue-400 {
-  color: #1d4ed8 !important; /* Deep rich royal blue */
 }
 
 html:not(.dark) .text-emerald-300,
@@ -222,17 +257,22 @@ html:not(.dark) .text-red-400 {
   color: #dc2626 !important; /* Deep rich crimson */
 }
 
-/* Light mode tints for AI banners, callout boxes & badges */
+/* Light mode tints for AI banners, callout boxes & badges - Zero Blue Theme */
 html:not(.dark) .bg-cyan-950\/20,
 html:not(.dark) .bg-cyan-950\/30,
-html:not(.dark) .bg-cyan-900\/20 {
-  background-color: #f0f9ff !important;
+html:not(.dark) .bg-cyan-900\/20,
+html:not(.dark) .bg-blue-950\/20,
+html:not(.dark) .bg-blue-950\/30,
+html:not(.dark) .bg-blue-900\/20 {
+  background-color: #ecfdf5 !important;
 }
 
 html:not(.dark) .border-cyan-800\/40,
 html:not(.dark) .border-cyan-800\/30,
-html:not(.dark) .border-cyan-900\/50 {
-  border-color: #bae6fd !important;
+html:not(.dark) .border-cyan-900\/50,
+html:not(.dark) .border-blue-800\/40,
+html:not(.dark) .border-blue-800\/30 {
+  border-color: #a7f3d0 !important;
 }
 
 html:not(.dark) .bg-emerald-950\/30,
@@ -370,10 +410,11 @@ html.dark .hvac-btn-inactive:hover {
   border: 1px solid #8b5cf6 !important;
   font-weight: 700 !important;
 }
-.hvac-btn-active-blue {
-  background-color: #2563eb !important;
+.hvac-btn-active-blue,
+.hvac-btn-active-emerald {
+  background-color: #059669 !important;
   color: #ffffff !important;
-  border: 1px solid #3b82f6 !important;
+  border: 1px solid #10b981 !important;
   font-weight: 700 !important;
 }
 

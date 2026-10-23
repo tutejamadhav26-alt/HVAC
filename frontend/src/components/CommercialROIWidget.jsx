@@ -104,11 +104,11 @@ export default function CommercialROIWidget({ unitId = 'HVAC-001' }) {
         <div className="bg-slate-800/60 border border-slate-700/60 rounded-xl p-4">
           <div className="flex items-center justify-between">
             <span className="text-xs uppercase tracking-wider text-slate-400 font-semibold">Annual Projected</span>
-            <span className="text-[10px] font-bold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded">
+            <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
               Per Unit
             </span>
           </div>
-          <div className="text-2xl font-black text-cyan-300 mt-1">
+          <div className="text-2xl font-black text-emerald-300 mt-1">
             {symbol}{annualCostSaved.toLocaleString(undefined, { maximumFractionDigits: 0 })}
           </div>
           <div className="text-[11px] text-slate-400 mt-1">

@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#0f172a"
+    android:background="#0a0f1d"
     android:padding="16dp">
 
     <LinearLayout
@@ -10,33 +10,138 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- App Header -->
-        <TextView
-            android:layout_width="wrap_content"
+        <!-- App Header with Logo -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Smart HVAC AI"
-            android:textColor="#38bdf8"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
 
-        <TextView
-            android:layout_width="wrap_content"
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/app_logo"
+                android:layout_marginRight="12dp"
+                android:contentDescription="Airconiq Logo" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Airconiq AI"
+                    android:textColor="#f8fafc"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PREDICT • PREVENT • PERFORM"
+                    android:textColor="#f59e0b"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvRoleBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="#10b98120"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:text="ADMIN"
+                android:textColor="#10b981"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Multiple Access Role Switcher Card -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:text="Mobile Diagnostic Companion"
-            android:textColor="#94a3b8"
-            android:textSize="14sp" />
+            android:background="#131e33"
+            android:orientation="vertical"
+            android:padding="14dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="Multiple Access Profile"
+                android:textColor="#38bdf8"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvRoleDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                android:text="Facility Director: Full master control &amp; overrides"
+                android:textColor="#94a3b8"
+                android:textSize="11sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/btnRoleAdmin"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_marginRight="4dp"
+                    android:background="#10b981"
+                    android:text="Admin"
+                    android:textColor="#ffffff"
+                    android:textSize="11sp" />
+
+                <Button
+                    android:id="@+id/btnRoleTech"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="2dp"
+                    android:layout_marginRight="2dp"
+                    android:background="#334155"
+                    android:text="Tech"
+                    android:textColor="#cbd5e1"
+                    android:textSize="11sp" />
+
+                <Button
+                    android:id="@+id/btnRoleAuditor"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:layout_marginLeft="4dp"
+                    android:background="#334155"
+                    android:text="Auditor"
+                    android:textColor="#cbd5e1"
+                    android:textSize="11sp" />
+            </LinearLayout>
+        </LinearLayout>
 
         <!-- API Connection Config Card -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:background="#1e293b"
+            android:background="#131e33"
             android:orientation="vertical"
             android:padding="12dp">
 
             <TextView
+                android:id="@+id/tvApiTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="6dp"
@@ -53,11 +158,12 @@
                 <EditText
                     android:id="@+id/editApiUrl"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="40dp"
                     android:layout_weight="1"
-                    android:background="#334155"
+                    android:background="#0a0f1d"
                     android:hint="http://192.168.1.100:8000"
-                    android:padding="8dp"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
                     android:textColor="#f8fafc"
                     android:textColorHint="#64748b"
                     android:textSize="13sp" />
@@ -65,9 +171,9 @@
                 <Button
                     android:id="@+id/btnSaveUrl"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:backgroundTint="#0284c7"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="8dp"
+                    android:background="#0284c7"
                     android:text="Set"
                     android:textColor="#ffffff"
                     android:textSize="12sp" />
@@ -75,9 +181,9 @@
                 <Button
                     android:id="@+id/btnRefresh"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="4dp"
-                    android:backgroundTint="#475569"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="4dp"
+                    android:background="#334155"
                     android:text="Sync"
                     android:textColor="#ffffff"
                     android:textSize="12sp" />
@@ -89,7 +195,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:background="#1e293b"
+            android:background="#131e33"
             android:gravity="center"
             android:orientation="vertical"
             android:padding="16dp">
@@ -144,7 +250,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:background="#1e293b"
+            android:background="#131e33"
             android:orientation="vertical"
             android:padding="16dp">
 
@@ -272,7 +378,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:background="#1e293b"
+            android:background="#131e33"
             android:orientation="vertical"
             android:padding="16dp">
 

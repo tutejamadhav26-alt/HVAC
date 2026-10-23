@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../context/AuthContext';
+import MagicRings from './MagicRings';
 import { 
   ShieldCheck, 
   Lock, 
@@ -10,9 +11,10 @@ import {
   AlertCircle, 
   CheckCircle2, 
   Building, 
+  Building2,
   Wrench, 
   BarChart3,
-  Sparkles
+  UserCheck
 } from 'lucide-react';
 
 export default function LoginPage() {
@@ -68,43 +70,51 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center py-10 px-4 relative">
+    <div className="min-h-[calc(100vh-8rem)] flex items-center justify-center py-6 px-4 relative">
       
       {/* Background Decorative Ambient Gradients */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-gradient-to-tr from-blue-500/10 via-indigo-500/10 to-cyan-500/10 rounded-full blur-3xl pointer-events-none -z-10" />
+      <div className="fixed inset-0 w-screen h-screen bg-gradient-to-tr from-purple-500/10 via-indigo-500/10 to-emerald-500/5 blur-3xl pointer-events-none -z-20" />
 
+      {/* Magic Rings Full-Screen Interactive Background */}
+      <div className="fixed inset-0 w-screen h-screen overflow-hidden pointer-events-auto -z-10 flex items-center justify-center">
+        <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+          <MagicRings
+            color="#A855F7"
+            colorTwo="#6366F1"
+            motion="pulse"
+            ringCount={6}
+            speed={1}
+            lineThickness={2}
+            glow={1}
+            hoverScale={1.2}
+            clickBurst={true}
+          />
+        </div>
+      </div>
+
+      {/* Centered Sign In Card */}
       <motion.div
         initial={{ opacity: 0, y: 24, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-md bg-white dark:bg-[#121212] border border-zinc-200/90 dark:border-zinc-800/90 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden backdrop-blur-xl"
+        className="w-full max-w-md mx-auto bg-white/90 dark:bg-[#121212]/90 border border-zinc-200/90 dark:border-zinc-800/90 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden backdrop-blur-xl z-10"
       >
-        {/* Top Accent Strip */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-600 via-indigo-500 to-cyan-400" />
-
         {/* Brand Header */}
         <div className="text-center mb-6">
-          <motion.div 
-            initial={{ scale: 0.8, rotate: -5 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            className="inline-block p-2 rounded-2xl bg-black border border-zinc-800 shadow-md mb-3"
-          >
+          <div className="relative inline-flex items-center justify-center mb-3">
+            <div className="absolute inset-0 w-24 h-24 -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 bg-gradient-to-tr from-amber-500/20 via-orange-500/15 to-blue-500/25 rounded-full blur-xl pointer-events-none" />
             <img 
-              src="/logo-icon.png" 
-              alt="AirconIQ" 
-              className="w-12 h-12 object-contain"
+              src="/logo-icon-transparent.png" 
+              alt="AirconIQ Emblem" 
+              className="relative w-16 h-16 sm:w-20 sm:h-20 object-contain hover:scale-105 transition-transform duration-300 drop-shadow-[0_6px_16px_rgba(0,0,0,0.15)] dark:drop-shadow-[0_8px_20px_rgba(59,130,246,0.3)]"
             />
-          </motion.div>
+          </div>
           
-          <h1 className="text-2xl font-black tracking-wider text-zinc-900 dark:text-zinc-50">
-            AIRCONIQ
+          <h1 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50">
+            Aircon<span className="text-emerald-500 font-extrabold">IQ</span>
           </h1>
-          <p className="text-[10px] font-bold tracking-widest text-amber-500 uppercase mt-0.5">
+          <p className="text-[11px] font-bold tracking-widest text-amber-500 dark:text-amber-400 uppercase mt-0.5">
             PREDICT • PREVENT • PERFORM
-          </p>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2">
-            Enterprise HVAC Operations & Autonomous Diagnostics
           </p>
         </div>
 
@@ -139,7 +149,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@company.com"
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-zinc-50 dark:bg-[#1a1a1a] border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition"
+                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-zinc-50 dark:bg-[#1a1a1a] border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition"
               />
             </div>
           </div>
@@ -158,7 +168,7 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-zinc-50 dark:bg-[#1a1a1a] border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition"
+                className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-zinc-50 dark:bg-[#1a1a1a] border border-zinc-200 dark:border-zinc-800 text-xs text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 transition"
               />
             </div>
           </div>
@@ -166,7 +176,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg active:scale-98 transition disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider shadow-md hover:shadow-lg active:scale-98 transition disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {loading ? (
               <>
@@ -185,8 +195,8 @@ export default function LoginPage() {
         {/* 1-Click Demo Profiles */}
         <div className="mt-6 pt-5 border-t border-zinc-200 dark:border-zinc-800">
           <div className="flex items-center justify-between mb-2.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-amber-500" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5">
+              <UserCheck className="w-3.5 h-3.5 text-emerald-500" />
               1-Click Demo Access:
             </span>
             <span className="text-[10px] text-zinc-400">Role-Based Authorization</span>
@@ -196,20 +206,20 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => handleQuickLogin('admin@airconiq.ai', 'admin123')}
-              className="w-full p-2 rounded-xl bg-zinc-100 dark:bg-[#181818] hover:bg-blue-50 dark:hover:bg-blue-950/30 border border-zinc-200/80 dark:border-zinc-800 text-left transition flex items-center justify-between group"
+              className="w-full p-2 rounded-xl bg-zinc-100 dark:bg-[#181818] hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border border-zinc-200/80 dark:border-zinc-800 text-left transition flex items-center justify-between group"
             >
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                   <Building className="w-3.5 h-3.5" />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                  <p className="text-xs font-bold text-zinc-900 dark:text-zinc-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400">
                     Facility Director
                   </p>
                   <p className="text-[10px] text-zinc-500">admin@airconiq.ai (Full Access)</p>
                 </div>
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
                 Admin
               </span>
             </button>
@@ -267,3 +277,5 @@ export default function LoginPage() {
     </div>
   );
 }
+
+
