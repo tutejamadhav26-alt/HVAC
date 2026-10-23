@@ -65,15 +65,15 @@ export default function LandingPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
           style={{ fontFamily: "'Plus Jakarta Sans', 'Inter', sans-serif" }}
-          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.16] max-w-4xl mx-auto mt-2 mb-4"
+          className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-[1.16] max-w-4xl mx-auto mt-2 mb-4"
         >
-          <span className="block text-zinc-900 dark:text-white drop-shadow-sm">
+          <span className="block text-zinc-950 dark:text-white drop-shadow-sm">
             AI–Based Smart HVAC
           </span>
-          <span className="block bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-500 dark:from-blue-400 dark:via-indigo-400 dark:to-cyan-400 bg-clip-text text-transparent">
+          <span className="block bg-gradient-to-r from-blue-600 via-sky-600 to-blue-600 dark:from-sky-400 dark:via-cyan-300 dark:to-sky-400 bg-clip-text text-transparent drop-shadow-[0_2px_14px_rgba(56,189,248,0.3)]">
             Monitoring and Prediction
           </span>
-          <span className="block bg-gradient-to-r from-cyan-500 to-blue-500 dark:from-cyan-400 dark:to-teal-300 bg-clip-text text-transparent">
+          <span className="block bg-gradient-to-r from-cyan-600 via-blue-600 to-cyan-600 dark:from-cyan-300 dark:via-sky-400 dark:to-cyan-300 bg-clip-text text-transparent drop-shadow-[0_2px_14px_rgba(34,211,238,0.3)]">
             System
           </span>
         </motion.h1>
