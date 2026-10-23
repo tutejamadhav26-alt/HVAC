@@ -62,8 +62,16 @@ export function DataProvider({ children }) {
 
     loadInitial();
 
-    // Attach WebSocket listener
+    // Attach WebSocket listener with standalone fallback pulse
+    let wsReceived = false;
+    let fallbackPulse = null;
+
     const cleanupWs = createWebSocketConnection((data) => {
+      wsReceived = true;
+      if (fallbackPulse) {
+        clearInterval(fallbackPulse);
+        fallbackPulse = null;
+      }
       if (data.reading) {
         setLatestReading(data.reading);
         setTelemetryHistory((prev) => [...prev.slice(-49), data.reading]);
@@ -83,7 +91,32 @@ export function DataProvider({ children }) {
       }
     });
 
-    return cleanupWs;
+    // If WebSocket is not connected (e.g. static host on Vercel), simulate live telemetry ticks
+    const pulseTimer = setTimeout(() => {
+      if (!wsReceived) {
+        fallbackPulse = setInterval(() => {
+          setLatestReading((prev) => {
+            const tempDelta = (Math.random() - 0.5) * 0.2;
+            const powerDelta = (Math.random() - 0.5) * 25;
+            const updated = {
+              ...prev,
+              temperature: +(prev.temperature + tempDelta).toFixed(1),
+              power: Math.round(Math.max(1200, Math.min(2200, (prev.power || 1715) + powerDelta))),
+              current: +(((prev.power || 1715) + powerDelta) / 220).toFixed(1),
+              timestamp: new Date().toISOString()
+            };
+            setTelemetryHistory((history) => [...history.slice(-49), updated]);
+            return updated;
+          });
+        }, 3000);
+      }
+    }, 3500);
+
+    return () => {
+      clearTimeout(pulseTimer);
+      if (fallbackPulse) clearInterval(fallbackPulse);
+      cleanupWs();
+    };
   }, []);
 
   const triggerScenario = async (scenarioName, speed = 1.0) => {

@@ -25,8 +25,6 @@ export function AuthProvider({ children }) {
           if (userData) {
             setUser(userData);
             localStorage.setItem('airconiq_user', JSON.stringify(userData));
-          } else {
-            logout();
           }
         } catch (e) {
           console.warn('Session verification fallback to cached user');
